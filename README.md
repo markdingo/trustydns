@@ -65,6 +65,7 @@ To fetch, compile and install trustydns, run the following commands:
 
 ```sh
 go get github.com/markdingo/trustydns   # Ignore the warning about no go programs
+
 cd $GOPATH/src/github.com/markdingo/trustydns
 
 make updatepackages        # Make sure dependent Go packages are installed and current
@@ -104,7 +105,7 @@ issue a regular query to port 6653, e.g:
 
 If all goes *really* well, the DNS query returns the MX RRs for Yahoo! which closely matches your
 previous `trustydns-dig` query. Both the proxy and the server should chatter away with their logging
-output.
+output showing "proof of life".
 
 If you've got this far, congratulations! You've successfully run all the programs and are now ready
 to deploy.
@@ -166,8 +167,8 @@ invocation:
 
 This invocation causes `trustydns-proxy` to redirect all queries for the search/domains in
 `/etc/resolv.conf` as well as the domains "example.net" and "168.192.in-addr.arpa" to the resolvers
-specified in /etc/resolv.conf. All other queries are sent via DoH queries to the servers on the
-command line. Redirection to local resolvers also includes all sub-domains of the specified domains.
+specified in /etc/resolv.conf. All other queries are forwarded to the DoH servers on the command
+line. Redirection to local resolvers also includes all sub-domains of the specified domains.
 
 **WARNING:** Make very sure that the proxy listen address is not included in the nominated
 resolv.conf file otherwise redirected queries will cause an unpleasant query loop.
@@ -178,7 +179,7 @@ resolv.conf file otherwise redirected queries will cause an unpleasant query loo
 A private proxy/server deployment is one in which both the proxy and server use privately generated
 certificates to authorize access to each other. If we assume that you have previously generated a
 rootCA and server and proxy certificates - perhaps with the help of the supplied [openssl
-scripts](./openssl/README.md), then proxy invocation looks something like:
+scripts](./openssl/README.md) - then proxy invocation looks something like:
 
 ```sh
 /usr/local/sbin/trustydns-proxy -v --tls-key proxy.key --tls-cert proxy.cert \
