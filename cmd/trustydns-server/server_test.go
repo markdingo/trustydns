@@ -141,7 +141,7 @@ type dnsQuestionParams struct {
 //
 // One could argue that such a complex test definition suggests the serverDoH() is too complicated
 // and should be deconstructed into more manageable components. Unfortunately that deconstruction
-// has already occured and in any event end-to-end tests are what these cases mainly supply. Further
+// has already occurred and in any event end-to-end tests are what these cases mainly supply. Further
 // simplification and deconstruction ideas more than welcome.
 type serverHTTPCase struct {
 	method          string

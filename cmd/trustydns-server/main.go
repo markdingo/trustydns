@@ -183,7 +183,7 @@ func mainExecute(args []string) int {
 
 	if cfg.verbose {
 		fmt.Fprintln(stdout, consts.ServerProgramName, consts.Version, "Starting")
-		for cn, _ := range tlsConfig.NameToCertificate { // Print CNs associated with certs loaded
+		for cn := range tlsConfig.NameToCertificate { // Print CNs associated with certs loaded
 			fmt.Fprintln(stdout, "Accepting TLS CN:", cn)
 		}
 		fmt.Fprintln(stdout, "Local resolution:", cfg.resolvConf)

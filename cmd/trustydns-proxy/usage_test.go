@@ -57,7 +57,7 @@ var usageTestCases = []usageTestCase{
 	// Bad options
 	{false, []string{"-t", "xxs", "http://localhost"}, []string{}, "invalid value"},
 	{false, []string{"-i", "xxs", "http://localhost"}, []string{}, "invalid value"},
-	{false, []string{"-r", "0", "http://localhost:63080"}, []string{}, "Minumum remote concurrency"},
+	{false, []string{"-r", "0", "http://localhost:63080"}, []string{}, "Minimum remote concurrency"},
 
 	// Bad local resolver config
 	{false, []string{"-c", "testdata/emptyfile", "http://localhost"}, []string{}, "No servers"},

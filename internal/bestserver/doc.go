@@ -1,6 +1,5 @@
 /*
-
-The bestserver package tracks the performance and reliability of each server for the purpose of
+Package bestserver tracks the performance and reliability of each server for the purpose of
 identifying which server is the most reliable and has the lowest latency. This package *should* work
 for any sort of latency-based set of servers (or performance which can be expressed as a
 time.Duration) regardless of what they actually do.

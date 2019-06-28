@@ -173,7 +173,7 @@ func mainExecute(args []string) int {
 	}
 
 	if cfg.maximumRemoteConnections < 1 {
-		return fatal("Minumum remote concurrency must be greater than zero (-r)")
+		return fatal("Minimum remote concurrency must be greater than zero (-r)")
 	}
 
 	var reporters []reporter.Reporter // Keep track of all reportable routines

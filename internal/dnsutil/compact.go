@@ -47,9 +47,8 @@ func CompactMsgString(m *dns.Msg) string {
 		qType = dns.TypeToString[q.Qtype]
 		qName = q.Name
 	}
-	opCode := "?"
-	ok := false
-	if opCode, ok = dns.OpcodeToString[m.MsgHdr.Opcode]; ok && len(opCode) >= 2 {
+	opCode, ok := dns.OpcodeToString[m.MsgHdr.Opcode]
+	if ok && len(opCode) >= 2 {
 		opCode = opCode[0:2]
 	}
 	s := fmt.Sprintf("%d/%s/%d (%s) %s/%s/%s %d/%d/%d",

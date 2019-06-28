@@ -8,8 +8,8 @@ import (
 type algorithm string
 
 const (
-	LatencyAlgorithm     algorithm = "latency"
-	TraditionalAlgorithm           = "traditional"
+	LatencyAlgorithm     algorithm = "latency"     // Pick the fastest most reliable server
+	TraditionalAlgorithm           = "traditional" // Pick until fails - just as res_send() does
 )
 
 // baseManager implements most of the Manager interface and provides helper routines that assist in

@@ -1,5 +1,5 @@
 /*
-The reporter package defines a simple interface for structs to produce a printable report about
+Package reporter defines a simple interface for structs to produce a printable report about
 themselves which are typically statistically oriented.
 
 The string returned by Report() should be one or more lines separated by newlines suitable for
@@ -10,6 +10,7 @@ the caller is likely to go: fmt.Println(you.Report()) or similar.
 */
 package reporter
 
+// Reporter is the sole package interface
 type Reporter interface {
 
 	// Name returns the name of the reportable struct. This is normally used

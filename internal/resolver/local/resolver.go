@@ -1,4 +1,4 @@
-// Implementation of internal/resolver - handle local lookups via /etc/resolv.conf
+// Package internal/resolver/local is a resolver implementation which handle local lookups via /etc/resolv.conf
 package local
 
 import (
@@ -116,6 +116,7 @@ func (t *local) resetCounters() {
 	t.resolverStats = resolverStats{}
 }
 
+// New is the constructor for a local resolver
 func New(config Config) (*local, error) {
 	t := &local{config: config} // Take a copy of the supplied config
 	err := t.loadResolvConf(t.config.ResolvConfPath)

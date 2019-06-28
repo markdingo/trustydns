@@ -1,7 +1,7 @@
-// The flagutil package provides additional support around the flag package. At the moment that
-// consists solely of the StringValue struct which conforms to the flag.Value method for multiple
-// occurrence flags containing string values. Conceivably an IPValue struct would be pretty useful
-// too as well as, e.g. a CIDRValue.
+// Package flagutil provides additional support around the flag package. At the moment that consists
+// solely of the StringValue struct which conforms to the flag.Value method for multiple occurrence
+// flags containing string values. Conceivably an IPValue struct would be pretty useful too as well
+// as, e.g. a CIDRValue.
 //
 // The reason for providing StringValue is so that commands can offer a flag to set multiple values
 // such as:
@@ -24,11 +24,12 @@ import (
 	"strings"
 )
 
+// StringValue is the type provided to flag.Var()
 type StringValue struct {
 	strings []string
 }
 
-// Set appends a string to the internal array - it is called by the flag package for each occurence
+// Set appends a string to the internal array - it is called by the flag package for each occurrence
 // of the corresponding option on the command line. Part of the flag.Value interface.
 func (t *StringValue) Set(s string) error {
 	t.strings = append(t.strings, s)

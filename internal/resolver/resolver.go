@@ -1,4 +1,4 @@
-// Interface for resolving a dns.Msg
+// Package resolver is the interface for resolving a dns.Msg via a local or DoH resolver
 package resolver
 
 import (
@@ -7,6 +7,7 @@ import (
 	"github.com/miekg/dns"
 )
 
+// DNSTransportType defines the transport type used to carry the DNS query
 type DNSTransportType string
 
 const (

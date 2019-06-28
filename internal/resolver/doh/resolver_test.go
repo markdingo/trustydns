@@ -258,7 +258,7 @@ func TestNew(t *testing.T) {
 		t.Error("New() did not set the http GET method, it set", res.httpMethod)
 	}
 
-	// Construst a more fully populated resolver
+	// Construct a more fully populated resolver
 
 	ip, cidr, err = net.ParseCIDR("8.8.8.8/24")
 	cfg = Config{ECSSetCIDR: cidr, ServerURLs: []string{"http://localhost"}}

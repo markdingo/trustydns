@@ -1,6 +1,6 @@
 // +build linux
 
-// setuid/setgid don't work on Linux via Go because Linux has a nutty arrangment whereby each thread
+// setuid/setgid don't work on Linux via Go because Linux has a nutty arrangement whereby each thread
 // has its own uid/gid. Perhaps because threads are processes in Linux? Anyway, it's been broken
 // since at least 2011 and hasn't been fixed in the intervening 8+ years.
 //

@@ -1,5 +1,5 @@
 /*
-The constants package provides common values used across all trustydns packages. Usage is to call the
+Package constants provides common values used across all trustydns packages. Usage is to call the
 global Get() function which returns the Constants by value ensuring that any modifications made
 (accidental or otherwise) will not affect other modules when they call Get().
 
@@ -13,6 +13,7 @@ is so that it can be fed directly into templating packages for printing usage me
 */
 package constants
 
+// Constants contains the system-wide constants
 type Constants struct {
 	DigProgramName    string
 	ProxyProgramName  string // Package related constants

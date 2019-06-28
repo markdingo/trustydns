@@ -1,5 +1,5 @@
 /*
-Implements internal/resolver/Resolver via remote (DoH) lookups
+Package internal/resolver/doh is a resolver implementation which handles (DoH) lookups via remote servers
 
 Typical usage is pretty straightforward. Create the resolver once
 then use it to resolve dns.Msgs.
@@ -203,7 +203,7 @@ func New(config Config, httpClient HTTPClientDo) (*remote, error) {
 // InBailiwick is a not-very-robust test for whether this resolver can handle the name in
 // question. It liberally accept anything that looks vaguely like a FQDN according to the miekg
 // checker routines.
-func (r *remote) InBailiwick(qName string) bool {
+func (t *remote) InBailiwick(qName string) bool {
 	if strings.Index(qName, ".") == -1 {
 		return false
 	}
@@ -234,7 +234,7 @@ func (r *remote) InBailiwick(qName string) bool {
 // Zero values in the SynthesizeECS HTTP headers have special meaning to the trustydns server in
 // that they instruct it *not* to generate an ECS option under *any* circumstances.
 //
-func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.Msg, *resolver.ResponseMetaData, error) {
+func (t *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.Msg, *resolver.ResponseMetaData, error) {
 	startTime := time.Now() // Track stats
 
 	originalECSRetained := true  // Track whether the original ECS was forwarded to the DoH server
@@ -264,15 +264,15 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 		}
 
 		// Rule 1. Remove any and all ECS options from the query
-		if r.config.ECSRemove && ecsPresent {
+		if t.config.ECSRemove && ecsPresent {
 			ecsRemoved = dnsutil.RemoveEDNS0FromOPT(dnsQ, dns.EDNS0SUBNET)
 			originalECSRetained = false
 			ecsPresent = false
 		}
 
 		// Rule 2. If Set configured and no ECS present in the query then set configured ECS.
-		if r.config.ECSSetCIDR != nil && !ecsPresent {
-			dnsutil.CreateECS(dnsQ, r.ecsFamily, r.ecsPrefixLength, r.ecsIP)
+		if t.config.ECSSetCIDR != nil && !ecsPresent {
+			dnsutil.CreateECS(dnsQ, t.ecsFamily, t.ecsPrefixLength, t.ecsIP)
 			originalECSRetained = false
 			ecsSet = true
 			ecsPresent = true
@@ -280,8 +280,8 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 
 		// Rule 3. If ECS Request configured and no ECS present in the query then set HTTP
 		// Synthesize request header.
-		if len(r.ecsRequestData) > 0 && !ecsPresent {
-			ecsRequestData = r.ecsRequestData
+		if len(t.ecsRequestData) > 0 && !ecsPresent {
+			ecsRequestData = t.ecsRequestData
 			originalECSRetained = false
 			ecsPresent = true // Strictly not true yet, but will be
 			ecsRequest = true
@@ -290,7 +290,7 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 
 	// For all query types adjust message ID for transport. This is allowed even for TSIG.
 
-	if r.httpMethod == http.MethodGet { // Msg ID SHOULD be zero for GET to aid cache friendliness
+	if t.httpMethod == http.MethodGet { // Msg ID SHOULD be zero for GET to aid cache friendliness
 		dnsQ.MsgHdr.Id = 0
 	}
 
@@ -312,19 +312,19 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 	var binary []byte
 	var err error
 
-	if r.config.GeneratePadding && msgIsMutable { // If padding and mutable, use PadAndPack() to serialize
-		binary, err = dnsutil.PadAndPack(dnsQ, r.consts.Rfc8467ClientPadModulo)
+	if t.config.GeneratePadding && msgIsMutable { // If padding and mutable, use PadAndPack() to serialize
+		binary, err = dnsutil.PadAndPack(dnsQ, t.consts.Rfc8467ClientPadModulo)
 	} else {
 		binary, err = dnsQ.Pack() // Otherwise use the regular Pack() method
 	}
 	if err != nil {
-		r.addGeneralFailure(dgxPackDNSQuery)
+		t.addGeneralFailure(dgxPackDNSQuery)
 		return nil, nil, errors.New(me + ":Msg Pack" + err.Error())
 	}
 
 	// Form the URL based on the current best server
 
-	bestURL, bsix := r.bestServer.Best()
+	bestURL, bsix := t.bestServer.Best()
 	url := bestURL.Name() // Extract the actual base URL
 
 	// If using HTTP GET the DNS query is base64URL encoded as the value of the query string. If
@@ -332,8 +332,8 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 	// remains as nil for GET but is set as a bytes.Reader of the binary query for POST.
 
 	var rd io.Reader
-	if r.httpMethod == http.MethodGet {
-		url += "?" + r.consts.Rfc8484QueryParam + "=" + base64.URLEncoding.EncodeToString(binary)
+	if t.httpMethod == http.MethodGet {
+		url += "?" + t.consts.Rfc8484QueryParam + "=" + base64.URLEncoding.EncodeToString(binary)
 	} else {
 		rd = bytes.NewReader(binary)
 	}
@@ -341,18 +341,18 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 	// Explicitly construct the http.Request for http.Client.Do() so that we can add Headers and
 	// conditionally supply an io.Reader.
 
-	req, err := http.NewRequest(r.httpMethod, url, rd)
+	req, err := http.NewRequest(t.httpMethod, url, rd)
 	if err != nil {
-		r.addServerFailure(bsix, dexCreateHTTPRequest)
+		t.addServerFailure(bsix, dexCreateHTTPRequest)
 		return nil, nil, err
 	}
 
 	// Set all our standard HTTP headers
 
-	req.Header.Set(r.consts.AcceptHeader, r.consts.Rfc8484AcceptValue)      // RFC SHOULD
-	req.Header.Set(r.consts.ContentTypeHeader, r.consts.Rfc8484AcceptValue) // RFC MUST
-	req.Header.Set(r.consts.UserAgentHeader,
-		r.consts.PackageName+"/"+r.consts.Version+" ("+r.consts.PackageURL+")")
+	req.Header.Set(t.consts.AcceptHeader, t.consts.Rfc8484AcceptValue)      // RFC SHOULD
+	req.Header.Set(t.consts.ContentTypeHeader, t.consts.Rfc8484AcceptValue) // RFC MUST
+	req.Header.Set(t.consts.UserAgentHeader,
+		t.consts.PackageName+"/"+t.consts.Version+" ("+t.consts.PackageURL+")")
 
 	// Are we configured to request ECS synthesis by the DoH server based on client IP and are
 	// we allowed to mutate the message? The DoH server will similarly check for mutability so
@@ -360,27 +360,27 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 	// impossible request.
 
 	if len(ecsRequestData) > 0 && msgIsMutable {
-		req.Header.Set(r.consts.TrustySynthesizeECSRequestHeader, ecsRequestData)
+		req.Header.Set(t.consts.TrustySynthesizeECSRequestHeader, ecsRequestData)
 	}
 
-	resp, err := r.httpClient.Do(req) // Issue the HTTP request
+	resp, err := t.httpClient.Do(req) // Issue the HTTP request
 	endTime := time.Now()
 	totalDuration := endTime.Sub(startTime)
 
 	if err != nil {
-		r.addServerFailure(bsix, dexDoRequest)
-		r.bestServer.Result(bestURL, false, endTime, 0)
+		t.addServerFailure(bsix, dexDoRequest)
+		t.bestServer.Result(bestURL, false, endTime, 0)
 		return nil, nil, err
 	}
 
-	r.bestServer.Result(bestURL, true, endTime, totalDuration)
+	t.bestServer.Result(bestURL, true, endTime, totalDuration)
 
 	// Decode and validate the DoH server response.
 
 	defer resp.Body.Close() // net/http advises this Close() to avoid a resource leak
 
 	if resp.StatusCode != http.StatusOK { // Only accept a 200 ok status
-		r.addServerFailure(bsix, dexNonStatusOk)
+		t.addServerFailure(bsix, dexNonStatusOk)
 		qName := "?"
 		if len(dnsQ.Question) >= 1 {
 			qName = dnsQ.Question[0].Name
@@ -391,26 +391,26 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		r.addServerFailure(bsix, dexResponseReadAll)
+		t.addServerFailure(bsix, dexResponseReadAll)
 		return nil, nil, fmt.Errorf(me+": Body Read Error: %s", err.Error())
 	}
 
-	ct := resp.Header.Get(r.consts.ContentTypeHeader)
-	if ct != r.consts.Rfc8484AcceptValue {
-		r.addServerFailure(bsix, dexContentType)
+	ct := resp.Header.Get(t.consts.ContentTypeHeader)
+	if ct != t.consts.Rfc8484AcceptValue {
+		t.addServerFailure(bsix, dexContentType)
 		return nil, nil, fmt.Errorf(me+": Expected Content-Type of '%s' but got '%s'",
-			r.consts.Rfc8484AcceptValue, ct)
+			t.consts.Rfc8484AcceptValue, ct)
 	}
 
-	if uint(len(body)) < r.consts.MinimumViableDNSMessage {
-		r.addServerFailure(bsix, dexContentType)
+	if uint(len(body)) < t.consts.MinimumViableDNSMessage {
+		t.addServerFailure(bsix, dexContentType)
 		return nil, nil, fmt.Errorf(me+": Response message length of %d is less than minimum viable of %d",
-			len(body), r.consts.MinimumViableDNSMessage)
+			len(body), t.consts.MinimumViableDNSMessage)
 	}
 
 	// Phew! The HTTP response is starting to look good. Extract the payload.
 
-	remoteDurationHeader := resp.Header.Get(r.consts.TrustyDurationHeader)
+	remoteDurationHeader := resp.Header.Get(t.consts.TrustyDurationHeader)
 	var remoteDuration time.Duration
 	if len(remoteDurationHeader) > 0 {
 		remoteDuration, _ = time.ParseDuration(remoteDurationHeader) // Ignore errors as it doesn't matter
@@ -421,7 +421,7 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 	httpR := &dns.Msg{}
 	err = httpR.Unpack(body)
 	if err != nil {
-		r.addServerFailure(bsix, dexUnpackDNSResponse)
+		t.addServerFailure(bsix, dexUnpackDNSResponse)
 		return nil, nil, fmt.Errorf(me+": dns.Unpack of reply failed: %s", err.Error())
 	}
 
@@ -434,7 +434,7 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 	// of zero is not well defined.
 
 	if msgIsMutable {
-		ageValue := resp.Header.Get(r.consts.AgeHeader) // A caching HTTPS proxy could return an 'age' response
+		ageValue := resp.Header.Get(t.consts.AgeHeader) // A caching HTTPS proxy could return an 'age' response
 		if len(ageValue) > 0 {
 			ttlAdjust, err := strconv.ParseUint(ageValue, 10, 32) // TTL is 32bit so...
 			if err == nil && ttlAdjust > 0 {
@@ -460,15 +460,15 @@ func (r *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.
 
 	httpR.MsgHdr.Id = originalId
 	if msgIsMutable {
-		if !originalECSRetained && r.config.ECSRedactResponse {
+		if !originalECSRetained && t.config.ECSRedactResponse {
 			dnsutil.RemoveEDNS0FromOPT(httpR, dns.EDNS0SUBNET)
 		}
-		if r.config.GeneratePadding {
+		if t.config.GeneratePadding {
 			dnsutil.RemoveEDNS0FromOPT(httpR, dns.EDNS0PADDING)
 		}
 	}
 
-	r.addSuccessStats(bsix, totalDuration, remoteDuration, ecsRemoved, ecsSet, ecsRequest, ecsReturned)
+	t.addSuccessStats(bsix, totalDuration, remoteDuration, ecsRemoved, ecsSet, ecsRequest, ecsReturned)
 
 	respMeta := &resolver.ResponseMetaData{
 		TransportType:      resolver.DNSTransportHTTP,

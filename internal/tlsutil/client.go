@@ -1,4 +1,4 @@
-// tlsutil is a helper package to manage tls key and cert settings
+// Package tlsutil is a helper package to manage tls key and cert settings for clients and servers
 package tlsutil
 
 import (

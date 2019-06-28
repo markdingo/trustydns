@@ -1,6 +1,6 @@
 /*
-concurrencytracker keeps track of how many concurrent requests are active. The purpose is simply
-to provide the ability to report peak concurrency over a reporting period. Typically usage:
+Package concurrencytracker keeps track of how many concurrent requests are active. The purpose is
+simply to provide the ability to report peak concurrency over a reporting period. Typically usage:
 
  var ct concurrencytrack.Counter
 
