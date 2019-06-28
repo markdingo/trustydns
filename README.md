@@ -64,8 +64,8 @@ programs have been tested on various CPU architectures with FreeBSD, Linux and m
 To fetch, compile and install trustydns, run the following commands:
 
 ```sh
-go get github.com/markdingo/trustydns
-cd $GOPATH/markdingo/trustydns
+go get github.com/markdingo/trustydns   # Ignore the warning about no go programs
+cd $GOPATH/src/github.com/markdingo/trustydns
 
 make updatepackages        # Make sure dependent Go packages are installed and current
 make clean all             # Compile everything
