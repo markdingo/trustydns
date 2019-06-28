@@ -1,0 +1,33 @@
+#! /bin/sh
+
+usage="Usage: make_proxy_cert rootCACertFile rootCAKeyFile"
+email=doh-postmaster@example.net
+
+rootcert=$1; shift
+if [ -z "$rootcert" ]; then
+    echo >&2 Error: Must supply root CA Certificate file as argument one
+    echo >&2 $usage
+    exit 1
+fi
+
+rootkey=$1; shift
+if [ -z "$rootkey" ]; then
+    echo >&2 Error: Must supply root CA Key file as argument two
+    echo >&2 $usage
+    exit 1
+fi
+
+if [ ! -z "$*" ]; then
+    echo >&2 Error: Superfluous goop on the command line: $*
+    echo >&2 $usage
+    exit 1
+fi
+
+openssl req -config site.conf -sha256 -newkey rsa:2048 -nodes \
+	-keyout proxy.key -out proxy.csr -days 3660 -batch \
+        -subj "/emailAddress=${email}"
+
+openssl x509 -req -in proxy.csr -sha256 \
+	-CA ${rootcert} -CAkey ${rootkey} -out proxy.cert -set_serial 01 -days 3660
+rm proxy.csr
+ls -l proxy.key proxy.cert

@@ -1,0 +1,12 @@
+#! /bin/sh
+
+# A shell script suitable for running after midnight each day. Make sure you set path to include the
+# trustydns/tools directory.
+
+PATH=$HOME/go/src/github.com/markdingo/trustydns/tools:$PATH
+
+who=${1:-root}
+logs=/var/log/trustydns-server
+
+tdt-cat-yesterday-multilogs $logs | tdt-analyze-serverlog |
+        mail -s "Daily trustydns server Stats from `hostname`" $who

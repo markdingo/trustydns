@@ -1,0 +1,18 @@
+#! /bin/sh
+
+usage="Usage: make_rootca_cert"
+email=doh-postmaster@example.net
+
+rm -rf cadir
+mkdir cadir
+touch cadir/database cadir/database.attr
+echo 01 >cadir/serial
+openssl genrsa -out rootCA.key 2048
+
+openssl req -config site.conf -new -key rootCA.key -nodes \
+	-keyout rootCA.key -out rootCA.csr -days 3660 -batch -sha256
+
+openssl ca -config site.conf -extensions v3_ca -in rootCA.csr \
+	-out rootCA.cert -keyfile rootCA.key \
+	-selfsign -md sha256 -days 3660 -batch
+rm rootCA.csr

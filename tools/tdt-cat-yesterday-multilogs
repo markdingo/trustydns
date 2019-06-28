@@ -1,0 +1,60 @@
+#! /bin/sh
+
+# Cat all log lines from yesterday from a multilog directory. Typical usage is to feed the output
+# into one of the analyze tools. It assumes that the dtm of the log files are as they when they were
+# created and that the contents are created by multilog and thus amenable to date decoding with
+# tai64nlocal.
+#
+# Typically usage is to feed the output into the corresponding log analysis program,
+# i.e. tdt-analyze-proxylog or tdt-analyze-serverlog. E.g.:
+#
+# tdt-cat-yesterday-multilogs /var/log/trustydns-proxy | tdt-analyze-proxylog
+
+set -e
+cd ${1:-.} # cd to dir on command line if given
+
+######################################################################
+# Work out when yesterday was. There's the easy way and the hard way. The hard way involves setting
+# the unix time value back by 1/3 of a day until the day of month changes. We can't just go back
+# 86400 seconds because today or yesterday may have been a short day due to daylight savings. Nor
+# can we just subtract a small amount as we don't know how far thru today we are.
+######################################################################
+
+yesterday=""
+
+case `uname`
+in
+    Darwin|FreeBSD)
+	yesterday=`date -v -1d +%Y-%m-%d`
+	;;
+    Linux) # work our way backwards as a local day can be shorter than 86400 seconds
+	now=`date +%s`
+	nowDD=`date --date=@${now} +%d`
+	try=$now
+	for dec in 28800 43200 86400 115200
+	do
+	    try=`expr $now - ${dec}`
+	    tryDD=`date --date=@${try} +%d`
+	    if [ $tryDD -ne $nowDD ];
+	    then
+		yesterday=`date --date=@${try} +%Y-%m-%d`
+		break
+	    fi
+	done
+	;;
+    *)
+	echo Warning: Guessing at how to determine yesterday for platform: `uname` >&2
+	yesterday=`date -v -1d +%Y-%m-%d` # Maybe this will work, maybe it won't
+	;;
+esac
+
+if [ -z "${yesterday}" ]; then
+    echo Warning: Could not determine the date of yesterday. Cannot continue.... >&2
+    exit 1
+fi
+
+# Search for files that have been modified in the last 2 days. That will ensure we get a complete
+# set of log entries to greap against.
+
+find . -mtime -2 -type f | sort | xargs cat | tai64nlocal | grep ^${yesterday}
+

@@ -1,0 +1,37 @@
+#! /bin/sh
+
+usage="Usage: make_server_certs rootCACertFile rootCAKeyFile domain1 ... domainn"
+
+rootcert=$1; shift
+if [ -z "$rootcert" ]; then
+    echo >&2 Error: Must supply root CA Certificate file as argument one
+    echo >&2 $usage
+    exit 1
+fi
+
+rootkey=$1; shift
+if [ -z "$rootkey" ]; then
+    echo >&2 Error: Must supply root CA Key file as argument two
+    echo >&2 $usage
+    exit 1
+fi
+
+domains=$*
+
+if [ -z "$domains" ]; then
+   echo >&2 Error: Need at least one domain name on the command line after the root CA files
+   exit 1
+fi
+
+for dom in $domains
+do
+    email=doh-postmaster@${dom}
+    openssl req -config site.conf -sha256 -newkey rsa:2048 -nodes \
+	    -keyout ${dom}.key -out ${dom}.csr -days 3660 -batch \
+	    -subj "/CN=${dom}/email=${email}"
+	     
+    openssl x509 -req -in ${dom}.csr -sha256 \
+	    -CA ${rootcert} -CAkey ${rootkey} -out ${dom}.cert  -set_serial 01 -days 3660
+    rm ${dom}.csr
+    ls -l ${dom}.key ${dom}.cert
+done
