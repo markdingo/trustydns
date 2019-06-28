@@ -38,7 +38,7 @@ critic:
 
 .PHONY: fmt
 fmt:
-	gofmt -w `find . -name '*.go' -type f -print`
+	gofmt -s -w `find . -name '*.go' -type f -print`
 
 .PHONY: updatepackages
 updatepackages:
