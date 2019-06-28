@@ -35,12 +35,12 @@ Additional deployment features which may be of interest include:
  * Split-horizon DNS settings to ensure local domain queries stay local
  * EDNS Client Subnet (RFC7871) controls for masking, substitution and synthesis
  * Support for alternate root CAs to enable private certificates
- * The proxy supports a pool of DoH servers so no single point of failure
+ * Proxy support for a pool of DoH servers so no single point of failure
 
 ## Caveats
 
 Trustydns is new and has some rough edges to it. It does not yet use `go mod` to manage dependencies
-(fortuitously their are few package dependencies) and the compilation and installation process is
+(fortuitously there are few package dependencies) and the compilation and installation process is
 simplistic at best.
 
 This package is targeted at DNS administrators with a modicum of Unix sysadmin experience. You need
