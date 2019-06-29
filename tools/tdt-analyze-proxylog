@@ -528,7 +528,7 @@ sub printLocalResolverServers() {
 	$six++;
 
 	$totals->{sfxExchangeError} += $d->{sfxExchangeError};
-	$totals->{sfxFormatError} += $d->{sfxExchangeError};
+	$totals->{sfxFormatError} += $d->{sfxFormatError};
 	$totals->{sfxServerFail} += $d->{sfxServerFail};
 	$totals->{sfxRefused} += $d->{sfxRefused};
 	$totals->{sfxNotImplemented} += $d->{sfxNotImplemented};
