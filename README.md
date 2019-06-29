@@ -6,6 +6,7 @@ with other DoH components. Trustydns is intended to comply with RFC8484 but has 
 non-standard features which can be optionally enabled.
 
 
+[![Build Status](https://travis-ci.org/markdingo/trustydns.svg?branch=master)](https://travis-ci.org/markdingo/trustydns)
 [![Go Report Card](https://goreportcard.com/badge/github.com/markdingo/trustydns)](https://goreportcard.com/report/github.com/markdingo/trustydns)
 
 ## Programs
