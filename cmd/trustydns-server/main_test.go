@@ -75,12 +75,12 @@ var mainTestCases = []mainTestCase{
 		[]string{"-v", "--log-all", "-A", "127.0.0.1:63086", "-c", "testdata/resolv.conf"},
 		[]string{"Starting", "Exiting"}, ""},
 
-	{"Wildcard listen address - may not work on some systems",
-		true, time.Millisecond, []string{}, []string{}, ""},
-
 	{"Status report",
 		false, 2 * time.Second, []string{"-v", "-i", "1s", "-A", "127.0.0.1:63087"},
 		[]string{"Listening: (HTTP on"}, ""},
+
+	{"Wildcard listen address - may not work on some systems",
+		true, time.Millisecond, []string{}, []string{}, ""},
 }
 
 func TestMain(t *testing.T) {
