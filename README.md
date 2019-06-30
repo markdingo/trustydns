@@ -207,10 +207,9 @@ root CA.
 
 ## Reporting Tools
 
-In verbose mode (-v) both the server and the proxy produce periodic statistic output which will
-normally be written to log files. There are a number of scripts in the [tools](./tools) directory
-which can produce summary reports from the log files. For details see
-[tools/README](tools/README.md).
+In verbose mode (-v) both the server and the proxy produce periodic statistical output which is
+normally written to log files. There are a number of scripts in the [tools](./tools) directory which
+produce summary reports from the log file entries. For details see [tools/README](tools/README.md).
 
 
 ## Other Documents
