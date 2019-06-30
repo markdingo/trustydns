@@ -2,6 +2,7 @@ package bestserver
 
 import (
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -81,48 +82,48 @@ func TestBaseLocking(t *testing.T) {
 
 	// Check writer lock
 	bm.lock()
-	otherGotLock := false
+	var otherGotLock int64
 	go func() {
 		bm.lock()
-		otherGotLock = true
+		atomic.StoreInt64(&otherGotLock, 1)
 		bm.unlock()
 	}()
 
 	time.Sleep(50 * time.Millisecond)
-	if otherGotLock {
+	if atomic.LoadInt64(&otherGotLock) != 0 {
 		t.Fatal("writer lock didn't stop concurrent access")
 	}
 	bm.unlock()
-	time.Sleep(50 * time.Millisecond)
-	if !otherGotLock {
+	time.Sleep(50 * time.Millisecond) // Other go func should take lock and increment
+	if atomic.LoadInt64(&otherGotLock) != 1 {
 		t.Fatal("writer unlock did not allow other writer to lock")
 	}
 
 	// Check reader lock
 	bm.rlock() // This may wait fractionally for the above go-routine to unlock, no matter
-	otherGotLock = false
+	atomic.StoreInt64(&otherGotLock, 0)
 	go func() {
 		bm.rlock()
-		otherGotLock = true // Two readers should be fine
+		atomic.StoreInt64(&otherGotLock, 1) // Two readers should be fine
 		bm.runlock()
 	}()
 	time.Sleep(50 * time.Millisecond)
-	if !otherGotLock {
+	if atomic.LoadInt64(&otherGotLock) != 1 {
 		t.Fatal("reader lock blocked second reader")
 	}
-	otherGotLock = false
+	atomic.StoreInt64(&otherGotLock, 0)
 	go func() {
 		bm.lock() // Writer should block
-		otherGotLock = true
+		atomic.StoreInt64(&otherGotLock, 1)
 		bm.unlock()
 	}()
 	time.Sleep(50 * time.Millisecond)
-	if otherGotLock {
+	if atomic.LoadInt64(&otherGotLock) == 1 {
 		t.Fatal("reader lock did not block writer")
 	}
 	bm.runlock()
 	time.Sleep(50 * time.Millisecond)
-	if !otherGotLock {
+	if atomic.LoadInt64(&otherGotLock) != 1 {
 		t.Fatal("reader unlock did not release blocked writer")
 	}
 }

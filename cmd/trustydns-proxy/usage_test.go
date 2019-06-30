@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 	"testing"
@@ -71,8 +70,8 @@ func TestUsage(t *testing.T) {
 	for tx, tc := range usageTestCases {
 		t.Run(fmt.Sprintf("%d", tx), func(t *testing.T) {
 			args := append([]string{"trustydns-proxy"}, tc.args...)
-			out := &bytes.Buffer{}
-			err := &bytes.Buffer{}
+			out := &mutexBytesBuffer{}
+			err := &mutexBytesBuffer{}
 			mainInit(out, err)
 			done := make(chan error)
 			go func() {

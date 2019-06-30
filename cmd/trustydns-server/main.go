@@ -31,10 +31,9 @@ var (
 	stdout io.Writer // All I/O goes via these writers
 	stderr io.Writer
 
-	startTime                = time.Now()
-	mainStarted, mainStopped bool // Record state transitions thru main (used by tests)
-	stopChannel              chan os.Signal
-	flagSet                  *flag.FlagSet
+	startTime   = time.Now()
+	stopChannel chan os.Signal
+	flagSet     *flag.FlagSet
 )
 
 //////////////////////////////////////////////////////////////////////
@@ -62,8 +61,7 @@ func mainInit(out io.Writer, err io.Writer) {
 	cfg = &config{}
 	stdout = out
 	stderr = err
-	mainStarted = false
-	mainStopped = false
+	mainState(Initial)
 	stopChannel = make(chan os.Signal, 4) // All reasonable signals cause us to quit or stats report
 	signal.Notify(stopChannel, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGUSR1)
 }
@@ -203,7 +201,7 @@ func mainExecute(args []string) int {
 			addr += ":" + consts.HTTPSDefaultPort
 		}
 
-		s := &server{local: resolver, listenAddress: addr}
+		s := &server{stdout: stdout, local: resolver, listenAddress: addr}
 		s.start(tlsConfig, errorChannel, wg)
 		if cfg.verbose {
 			fmt.Fprintln(stdout, "Listening:", s.listenName())
@@ -233,21 +231,21 @@ func mainExecute(args []string) int {
 	// Note that this is not a problem with DNS listening as miekg/dns.Server offers a notify
 	// function which is called once the socket has been opened.
 
-	go func() {
+	go func(setuidName, setgidName, chrootDir string, verbose bool, stdout io.Writer) {
 		time.Sleep(3 * time.Second) // Hopefully absurdly large but also not too huge a security window
-		err := osutil.Constrain(cfg.setuidName, cfg.setgidName, cfg.chrootDir)
+		err := osutil.Constrain(setuidName, setgidName, chrootDir)
 		if err != nil {
 			errorChannel <- err // Force main go-routine to exit
 			return
 		}
-		if cfg.verbose {
+		if verbose {
 			fmt.Fprintf(stdout, "Constraints: %s\n", osutil.ConstraintReport())
 		}
-	}()
+	}(cfg.setuidName, cfg.setgidName, cfg.chrootDir, cfg.verbose, stdout)
 
 	// Loop forever giving periodic status reports and checking for a termination event.
 
-	mainStarted = true // Tell testers that we're up and running
+	mainState(Started) // Tell testers we're up and running
 	nextStatusIn := nextInterval(time.Now(), cfg.statusInterval)
 
 Running:
@@ -279,8 +277,8 @@ Running:
 	for _, s := range servers {
 		s.stop()
 	}
-	mainStopped = true
-	wg.Wait() // Wait for all servers to shut down
+	mainState(Stopped) // Tell testers we've stopped accepting requests
+	wg.Wait()          // Wait for all servers to completely shut down
 
 	if cfg.verbose {
 		statusReport("Status", true, reporters) // One last report prior to exiting

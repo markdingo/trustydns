@@ -5,10 +5,32 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"syscall"
 	"testing"
 	"time"
 )
+
+// We use a bytes.Buffer as stdout, stderr which is shared across multiple go-routines so we need to
+// protected it from concurrent access. This is test-only code but -race doesn't know that.
+type mutexBytesBuffer struct {
+	mu     sync.Mutex
+	buffer bytes.Buffer
+}
+
+func (t *mutexBytesBuffer) Write(p []byte) (n int, err error) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	return t.buffer.Write(p)
+}
+
+func (t *mutexBytesBuffer) String() string {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	return t.buffer.String()
+}
 
 //////////////////////////////////////////////////////////////////////
 
@@ -84,8 +106,8 @@ func TestMain(t *testing.T) {
 				return
 			}
 			args := append([]string{"trustydns-proxy"}, tc.args...)
-			out := &bytes.Buffer{}
-			err := &bytes.Buffer{}
+			out := &mutexBytesBuffer{}
+			err := &mutexBytesBuffer{}
 			mainInit(out, err)
 			done := make(chan error)
 			go func() {
@@ -147,8 +169,8 @@ func TestNextInterval(t *testing.T) {
 
 // Test that SIGUSR1 causes a stats report
 func TestUSR1(t *testing.T) {
-	out := &bytes.Buffer{}
-	err := &bytes.Buffer{}
+	out := &mutexBytesBuffer{}
+	err := &mutexBytesBuffer{}
 	args := []string{"trustydns-proxy", "-A", "127.0.0.1:5356", "http://localhost"}
 	mainInit(out, err) // Start up quietly
 	go func() {
@@ -171,23 +193,23 @@ func TestUSR1(t *testing.T) {
 // terminates as expected. If not, t.Fatal()
 func waitForMainExecute(t *testing.T, howLong time.Duration) error {
 	for ix := 0; ix < 10; ix++ { // Wait for up to two seconds for main to get running
-		if mainStarted {
+		if isMain(Started) {
 			break
 		}
 		time.Sleep(time.Millisecond * 200)
 	}
-	if !mainStarted {
+	if !isMain(Started) {
 		return fmt.Errorf("mainStarted did not get set after two seconds")
 	}
 	time.Sleep(howLong)          // Give it the designated time to complete
 	stopMain()                   // Then ask it to finished up
 	for ix := 0; ix < 10; ix++ { // Wait for up to two seconds for main to terminate
-		if mainStopped {
+		if isMain(Stopped) {
 			break
 		}
 		time.Sleep(time.Millisecond * 200)
 	}
-	if !mainStopped {
+	if !isMain(Stopped) {
 		return fmt.Errorf("mainStopped did not get set two seconds after mainStarted")
 	}
 

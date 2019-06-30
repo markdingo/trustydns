@@ -46,7 +46,8 @@ func (t *mockResolver) Resolve(query *dns.Msg, qMeta *resolver.QueryMetaData) (*
 
 // Test that the basic server starts up correctly. May as well do this before proceeding.
 func TestStart(t *testing.T) {
-	s := &server{local: &mockResolver{}, listenAddress: "127.0.0.1:59053"}
+	mainInit(os.Stdout, os.Stderr)
+	s := &server{stdout: stdout, local: &mockResolver{}, listenAddress: "127.0.0.1:59053"}
 	errorChannel := make(chan error)
 	wg := &sync.WaitGroup{} // Wait on all servers
 	s.start(nil, errorChannel, wg)
@@ -83,7 +84,7 @@ var routingCases = []routingCase{
 func TestRouting(t *testing.T) {
 	mainInit(os.Stdout, os.Stderr)
 	resolver := &mockResolver{}
-	dohServer := &server{local: resolver}
+	dohServer := &server{stdout: stdout, local: resolver}
 
 	httpServer := httptest.NewServer(dohServer.newRouter())
 	defer httpServer.Close()
@@ -355,8 +356,8 @@ func TestHTTP(t *testing.T) {
 	for _, tc := range serverHTTPCases {
 		t.Run(tc.description, func(t *testing.T) {
 			client := http.Client{}
-			stdout := &bytes.Buffer{} // Capture these outputs in case the test cases
-			stderr := &bytes.Buffer{} // want to see what was written to these fds
+			stdout := &mutexBytesBuffer{} // Capture these outputs in case the test cases
+			stderr := &mutexBytesBuffer{} // want to see what was written to these fds
 			mainInit(stdout, stderr)
 
 			cfg.logClientIn = true  // Turn on all logging to ensure that we exercise
@@ -367,7 +368,7 @@ func TestHTTP(t *testing.T) {
 			cfg.logLocalOut = true
 			cfg.logTLSErrors = true
 
-			dohServer := &server{}
+			dohServer := &server{stdout: stdout}
 
 			httpServer := httptest.NewServer(dohServer.newRouter())
 			defer httpServer.Close()
@@ -536,7 +537,7 @@ func (t *mockBody) Close() error {
 // Test via serverDoH directly as this error cannot easily be exercised with a test client.
 func TestReadBodyFailure(t *testing.T) {
 	resolver := &mockResolver{err: errors.New("Mock Resolver Error")}
-	s := &server{local: resolver, listenAddress: "127.0.0.1:59053"}
+	s := &server{stdout: stdout, local: resolver, listenAddress: "127.0.0.1:59053"}
 	mw := newMockResponseWriter()
 	msg := &dns.Msg{}
 	msg.SetQuestion("example.com.", dns.TypeMX)
@@ -560,7 +561,7 @@ func TestReadBodyFailure(t *testing.T) {
 func TestParseRemoteFailure(t *testing.T) {
 	mainInit(os.Stdout, os.Stderr)
 
-	s := &server{local: &mockResolver{}}
+	s := &server{stdout: stdout, local: &mockResolver{}}
 	mw := newMockResponseWriter()
 
 	msg := &dns.Msg{}
@@ -590,7 +591,7 @@ func TestParseRemoteFailure(t *testing.T) {
 func TestParseRemoteIPv6(t *testing.T) {
 	mainInit(os.Stdout, os.Stderr)
 
-	s := &server{local: &mockResolver{}}
+	s := &server{stdout: stdout, local: &mockResolver{}}
 	mw := newMockResponseWriter()
 
 	msg := &dns.Msg{}
@@ -617,11 +618,11 @@ func TestParseRemoteIPv6(t *testing.T) {
 
 // Test via serverDoH directly
 func TestWriterFailure(t *testing.T) {
-	stdout := &bytes.Buffer{}
-	stderr := &bytes.Buffer{}
+	stdout := &mutexBytesBuffer{}
+	stderr := &mutexBytesBuffer{}
 	mainInit(stdout, stderr)
 	cfg.logClientOut = true // Capture log output to confirm correct error processing
-	s := &server{local: &mockResolver{}}
+	s := &server{stdout: stdout, local: &mockResolver{}}
 	mw := newMockResponseWriter()
 	mw.writeError = errors.New("mockResponseWriter Write failed")
 
@@ -650,10 +651,10 @@ func TestWriterFailure(t *testing.T) {
 
 // Confirm that the verificaton failure is captured via the rather clunky httpLogCapture
 func TestClientVerificationFailure(t *testing.T) {
-	stdout := &bytes.Buffer{}
-	stderr := &bytes.Buffer{}
+	stdout := &mutexBytesBuffer{}
+	stderr := &mutexBytesBuffer{}
 	mainInit(stdout, stderr)
-	dohServer := &server{local: &mockResolver{}}
+	dohServer := &server{stdout: stdout, local: &mockResolver{}}
 	cfg.logTLSErrors = true
 
 	cas := []string{"testdata/rootCA.cert"}
@@ -664,7 +665,7 @@ func TestClientVerificationFailure(t *testing.T) {
 	}
 	httpsServer := httptest.NewUnstartedServer(dohServer.newRouter())
 	httpsServer.TLS = tlsConfig
-	httpsServer.Config = &http.Server{ErrorLog: log.New(&httpLogCapture{server: dohServer}, "", 0)}
+	httpsServer.Config = &http.Server{ErrorLog: log.New(&httpLogCapture{server: dohServer, stdout: stdout}, "", 0)}
 	httpsServer.StartTLS()
 
 	client := http.Client{}

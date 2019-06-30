@@ -11,7 +11,7 @@ const expect1 = "req=14 ok=2 (0/0/0/0/0/0) al=0.750 errs=12 (1/1/1/1/1/1/1/1/1/1
 
 func TestReporter(t *testing.T) {
 	mainInit(os.Stdout, os.Stderr) // Make sure cfg is initialized
-	s := &server{listenAddress: "127.0.0.1"}
+	s := &server{stdout: stdout, listenAddress: "127.0.0.1"}
 	name := s.Name()
 	if !strings.Contains(name, "Listener") {
 		t.Error("Name does not contain 'Listener'", name)

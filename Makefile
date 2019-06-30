@@ -24,13 +24,13 @@ cmd/trustydns-server/trustydns-server cmd/trustydns-proxy/trustydns-proxy cmd/tr
 race:
 	@for dir in $(cmddirs); do echo $$dir; $(MAKE) -C $$dir $@; done
 
-.PHONY: clean vet
-clean vet:
+.PHONY: clean vet test
+clean vet test:
 	go $@ ./...
 
-.PHONY: test
-test:
-	go $@ ./...
+.PHONY: testrace
+testrace:
+	go test -race ./...
 
 .PHONY: critic
 critic:

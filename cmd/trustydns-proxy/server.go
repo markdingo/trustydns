@@ -38,6 +38,7 @@ corner-cases probably isn't productive.
 
 import (
 	"fmt"
+	"io"
 	"strings"
 	"sync"
 	"time"
@@ -71,6 +72,7 @@ type stats struct {
 }
 
 type server struct {
+	stdout        io.Writer
 	remote        resolver.Resolver // Mandatory resolver - never nil
 	local         resolver.Resolver // Optional resolver - may be nil
 	listenAddress string
@@ -124,7 +126,7 @@ func (t *server) ServeDNS(writer dns.ResponseWriter, query *dns.Msg) {
 	}
 
 	if cfg.logClientIn {
-		fmt.Fprintln(stdout, inType+writer.RemoteAddr().String()+":"+dnsutil.CompactMsgString(query))
+		fmt.Fprintln(t.stdout, inType+writer.RemoteAddr().String()+":"+dnsutil.CompactMsgString(query))
 	}
 
 	// Forward the request for resolution to either the local resolver or a remote DoH
@@ -140,7 +142,7 @@ func (t *server) ServeDNS(writer dns.ResponseWriter, query *dns.Msg) {
 		t.addFailureStats(serNoResponse, evs)
 		msg := err.Error()
 		if cfg.logClientOut || (cfg.logTLSErrors && strings.Contains(msg, "x509: ")) {
-			fmt.Fprintln(stdout, "CE:"+dnsutil.CompactMsgString(query), msg)
+			fmt.Fprintln(t.stdout, "CE:"+dnsutil.CompactMsgString(query), msg)
 		}
 		return
 	}
@@ -171,14 +173,14 @@ func (t *server) ServeDNS(writer dns.ResponseWriter, query *dns.Msg) {
 	if err != nil {
 		t.addFailureStats(serDNSWriteFailed, evs)
 		if cfg.logClientOut {
-			fmt.Fprintln(stdout, "CE:"+err.Error())
+			fmt.Fprintln(t.stdout, "CE:"+err.Error())
 		}
 		return
 	}
 
 	t.addSuccessStats(duration, evs)
 	if cfg.logClientOut {
-		fmt.Fprintln(stdout, outType+dnsutil.CompactMsgString(resp),
+		fmt.Fprintln(t.stdout, outType+dnsutil.CompactMsgString(resp),
 			respMeta.QueryTries, respMeta.ServerTries, "F:"+respMeta.FinalServerUsed, duration)
 	}
 }

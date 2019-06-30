@@ -38,10 +38,9 @@ var (
 	stdout io.Writer // All I/O goes via these writers
 	stderr io.Writer
 
-	startTime                = time.Now()
-	mainStarted, mainStopped bool // Record state transitions thru main (used by tests)
-	stopChannel              chan os.Signal
-	flagSet                  *flag.FlagSet
+	startTime   = time.Now()
+	stopChannel chan os.Signal
+	flagSet     *flag.FlagSet
 )
 
 //////////////////////////////////////////////////////////////////////
@@ -70,8 +69,7 @@ func mainInit(out io.Writer, err io.Writer) {
 	listenTransports = []string{}
 	stdout = out
 	stderr = err
-	mainStarted = false
-	mainStopped = false
+	mainState(Initial)
 	stopChannel = make(chan os.Signal, 4) // All reasonable signals cause us to quit or stats report
 	signal.Notify(stopChannel, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGUSR1)
 }
@@ -282,7 +280,7 @@ func mainExecute(args []string) int {
 		}
 
 		for _, transport := range listenTransports {
-			s := &server{local: localResolver, remote: remoteResolver,
+			s := &server{stdout: stdout, local: localResolver, remote: remoteResolver,
 				listenAddress: addr, transport: transport}
 			s.start(errorChannel, wg)
 			if cfg.verbose {
@@ -308,7 +306,7 @@ func mainExecute(args []string) int {
 
 	// Loop forever giving periodic status reports and checking for a termination event.
 
-	mainStarted = true // Tell testers that we're up and running
+	mainState(Started) // Tell testers we're up and running
 	nextStatusIn := nextInterval(time.Now(), cfg.statusInterval)
 
 Running:
@@ -339,8 +337,8 @@ Running:
 		s.stop()
 	}
 
-	mainStopped = true
-	wg.Wait() // Wait for all servers to shut down
+	mainState(Stopped) // Tell testers we've stopped accepting requests
+	wg.Wait()          // Wait for all servers to completely shut down
 
 	if cfg.verbose {
 		statusReport("Status", true, reporters) // One last report prior to exiting

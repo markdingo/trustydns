@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -13,7 +14,7 @@ const (
 
 func TestReporter(t *testing.T) {
 	var evs events
-	s := &server{listenAddress: "127.0.0.1", transport: "udp"}
+	s := &server{stdout: os.Stdout, listenAddress: "127.0.0.1", transport: "udp"}
 	name := s.Name()
 	if !strings.Contains(name, "127.0.0.1/udp") {
 		t.Error("Name does not contain IP address", name)

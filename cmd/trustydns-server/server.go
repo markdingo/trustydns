@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net"
@@ -62,6 +63,7 @@ type stats struct {
 }
 
 type server struct {
+	stdout        io.Writer
 	local         resolver.Resolver
 	listenAddress string
 	server        *http.Server               // Keep a copy solely for the stop() method
@@ -77,13 +79,15 @@ type server struct {
 // with an invalid certificate so we basically scrape the error messages that the http package logs.
 type httpLogCapture struct { // I/O Writer to statisfy log.New()
 	server *server
+	stdout io.Writer
+	logit  bool
 }
 
 func (t *httpLogCapture) Write(data []byte) (int, error) {
 	t.server.addFailureStats(serClientTLSBad, events{})
-	if cfg.logTLSErrors {
-		fmt.Fprint(stdout, "Client TLS Error: ")
-		return stdout.Write(data)
+	if t.logit {
+		fmt.Fprint(t.stdout, "Client TLS Error: ")
+		return t.stdout.Write(data)
 	}
 
 	return len(data), nil
@@ -93,10 +97,11 @@ func (t *httpLogCapture) Write(data []byte) (int, error) {
 func (t *server) start(tlsConfig *tls.Config, errorChan chan error, wg *sync.WaitGroup) {
 	t.server = &http.Server{
 		Addr:      t.listenAddress,
-		ErrorLog:  log.New(&httpLogCapture{server: t}, "", 0),
+		ErrorLog:  log.New(&httpLogCapture{server: t, stdout: t.stdout, logit: cfg.logTLSErrors}, "", 0),
 		Handler:   t.newRouter(),
 		TLSConfig: tlsConfig,
 	}
+
 	t.connTrk = connectiontracker.New(t.listenName())
 	t.server.ConnState = func(c net.Conn, state http.ConnState) {
 		t.connTrk.ConnState(c.RemoteAddr().String(), time.Now(), state)
@@ -136,7 +141,7 @@ func (t *server) serveDoH(writer http.ResponseWriter, httpReq *http.Request) {
 	}
 
 	if cfg.logHTTPIn {
-		fmt.Fprintln(stdout, "HI:"+httpReq.RemoteAddr, http.MethodPost, httpReq.URL.String())
+		fmt.Fprintln(t.stdout, "HI:"+httpReq.RemoteAddr, http.MethodPost, httpReq.URL.String())
 	}
 
 	// Validate the request
@@ -172,14 +177,14 @@ func (t *server) serveDoH(writer http.ResponseWriter, httpReq *http.Request) {
 		msg := fmt.Sprintf("Error: dns.Unpack failed: %s", err.Error())
 		t.error(writer, httpReq.RemoteAddr, http.StatusBadRequest, msg)
 		if cfg.logClientIn {
-			fmt.Fprintln(stdout, "CE:"+msg)
+			fmt.Fprintln(t.stdout, "CE:"+msg)
 		}
 		t.addFailureStats(serDNSUnpackRequestFailed, evs)
 		return
 	}
 
 	if cfg.logClientIn {
-		fmt.Fprintln(stdout, "CI:"+dnsutil.CompactMsgString(dnsQ))
+		fmt.Fprintln(t.stdout, "CI:"+dnsutil.CompactMsgString(dnsQ))
 	}
 
 	// If the query Id is zero (which it should be for GET), generate a non-zero Id and remember
@@ -223,7 +228,7 @@ func (t *server) serveDoH(writer http.ResponseWriter, httpReq *http.Request) {
 	// Resolve
 
 	if cfg.logLocalOut {
-		fmt.Fprintln(stdout, "LO:"+dnsutil.CompactMsgString(dnsQ))
+		fmt.Fprintln(t.stdout, "LO:"+dnsutil.CompactMsgString(dnsQ))
 	}
 	startTime := time.Now() // Track latency
 	var dnsR *dns.Msg
@@ -234,14 +239,14 @@ func (t *server) serveDoH(writer http.ResponseWriter, httpReq *http.Request) {
 		msg := fmt.Sprintf("Error: local resolution failed: %s", err.Error())
 		t.error(writer, httpReq.RemoteAddr, http.StatusServiceUnavailable, msg)
 		if cfg.logLocalOut {
-			fmt.Fprintln(stdout, "LE:"+msg)
+			fmt.Fprintln(t.stdout, "LE:"+msg)
 		}
 		t.addFailureStats(serLocalResolutionFailed, evs)
 		return
 	}
 
 	if cfg.logLocalIn {
-		fmt.Fprintln(stdout, "LI:"+dnsutil.CompactMsgString(dnsR),
+		fmt.Fprintln(t.stdout, "LI:"+dnsutil.CompactMsgString(dnsR),
 			dnsRMeta.QueryTries, dnsRMeta.ServerTries, dnsRMeta.FinalServerUsed)
 	}
 
@@ -258,7 +263,7 @@ func (t *server) serveDoH(writer http.ResponseWriter, httpReq *http.Request) {
 		msg := fmt.Sprintf("DNS Pack Failed: %s", err.Error())
 		t.error(writer, httpReq.RemoteAddr, http.StatusServiceUnavailable, msg)
 		if cfg.logClientOut {
-			fmt.Fprintln(stdout, "LE:"+msg)
+			fmt.Fprintln(t.stdout, "LE:"+msg)
 		}
 		t.addFailureStats(serDNSPackResponseFailed, evs)
 		return
@@ -275,7 +280,7 @@ func (t *server) serveDoH(writer http.ResponseWriter, httpReq *http.Request) {
 		msg := fmt.Sprintf("writer.Write(body) failed %s", err.Error())
 		t.error(writer, httpReq.RemoteAddr, http.StatusServiceUnavailable, msg)
 		if cfg.logClientOut {
-			fmt.Fprintln(stdout, "DE:"+msg)
+			fmt.Fprintln(t.stdout, "DE:"+msg)
 		}
 		t.addFailureStats(serHTTPWriterFailed, evs)
 		return
@@ -283,11 +288,11 @@ func (t *server) serveDoH(writer http.ResponseWriter, httpReq *http.Request) {
 
 	t.addSuccessStats(duration, evs)
 	if cfg.logClientOut {
-		fmt.Fprintln(stdout, "CO:"+dnsutil.CompactMsgString(dnsR),
+		fmt.Fprintln(t.stdout, "CO:"+dnsutil.CompactMsgString(dnsR),
 			dnsRMeta.QueryTries, dnsRMeta.ServerTries, dnsRMeta.FinalServerUsed, duration)
 	}
 	if cfg.logHTTPOut {
-		fmt.Fprintln(stdout, "HO:", httpReq.RemoteAddr, "200 Ok", len(body), duration)
+		fmt.Fprintln(t.stdout, "HO:", httpReq.RemoteAddr, "200 Ok", len(body), duration)
 	}
 }
 
@@ -460,13 +465,16 @@ func parseRemoteAddr(ra string) (net.IP, error) {
 func (t *server) error(writer http.ResponseWriter, remoteAddr string, statusCode int, msg string) {
 	http.Error(writer, msg, statusCode)
 	if cfg.logHTTPOut {
-		fmt.Fprintln(stdout, "HE:", remoteAddr, statusCode, msg)
+		fmt.Fprintln(t.stdout, "HE:", remoteAddr, statusCode, msg)
 	}
 }
 
 // stop performs an orderly shutdown of listen sockets. Mainly for tests!
 func (t *server) stop() {
 	if t.server != nil {
-		t.server.Shutdown(context.Background())
+		err := t.server.Shutdown(context.Background())
+		if cfg.logHTTPOut && err != nil {
+			fmt.Fprintln(t.stdout, "HE:Shutdown:", err.Error())
+		}
 	}
 }

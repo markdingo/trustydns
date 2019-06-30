@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"net"
 	"os"
@@ -74,7 +73,7 @@ func (t *mockResponseWriter) Hijack() {
 
 // Test that the actual server starts up when given the simplest of settings.
 func TestServerStart(t *testing.T) {
-	s := &server{listenAddress: "127.0.0.1:59053", transport: "udp"}
+	s := &server{stdout: stdout, listenAddress: "127.0.0.1:59053", transport: "udp"}
 	errorChannel := make(chan error)
 	wg := &sync.WaitGroup{} // Wait on all servers
 	s.start(errorChannel, wg)
@@ -95,7 +94,7 @@ func TestServerBasicQuery(t *testing.T) {
 	mainInit(os.Stdout, os.Stderr)
 	resolver := &mockResolver{ib: true} // Returns true on call to InBailiwick()
 	resolver.response.MsgHdr.Id = 4001
-	s := &server{local: resolver}
+	s := &server{stdout: stdout, local: resolver}
 	mw := &mockResponseWriter{}
 	q := &dns.Msg{}
 	q.SetQuestion("example.com.", dns.TypeNS)
@@ -120,13 +119,13 @@ func TestServerBasicQuery(t *testing.T) {
 
 // Test that normal logging branches are taken
 func TestServerLogging(t *testing.T) {
-	stdout := &bytes.Buffer{}
-	stderr := &bytes.Buffer{}
+	stdout := &mutexBytesBuffer{}
+	stderr := &mutexBytesBuffer{}
 	mainInit(stdout, stderr)
 	cfg.logClientIn = true
 	cfg.logClientOut = true
 	resolver := &mockResolver{ib: true}
-	s := &server{local: resolver}
+	s := &server{stdout: stdout, local: resolver}
 	mw := &mockResponseWriter{}
 	q := &dns.Msg{}
 	q.SetQuestion("example.com.", dns.TypeNS)
@@ -142,11 +141,11 @@ func TestServerLogging(t *testing.T) {
 
 // Test for error return from the resolver. Check error logging while we're at it.
 func TestServerResolverError(t *testing.T) {
-	stdout := &bytes.Buffer{}
+	stdout := &mutexBytesBuffer{}
 	mainInit(stdout, os.Stderr)
 	cfg.logClientOut = true
 	resolver := &mockResolver{err: errors.New("Mock Resolver Error")} // Resolver returns an err
-	s := &server{remote: resolver}
+	s := &server{stdout: stdout, remote: resolver}
 	mw := &mockResponseWriter{}
 	q := &dns.Msg{}
 	q.SetQuestion("example.com.", dns.TypeNS)
@@ -168,11 +167,11 @@ func TestServerResolverError(t *testing.T) {
 
 // Test for error return from dbs.WriteMsg. Check for error logging while we're at it.
 func TestServerWriteMsgError(t *testing.T) {
-	stdout := &bytes.Buffer{}
+	stdout := &mutexBytesBuffer{}
 	mainInit(stdout, os.Stderr)
 	cfg.logClientOut = true
 	resolver := &mockResolver{}
-	s := &server{remote: resolver}
+	s := &server{stdout: stdout, remote: resolver}
 	mw := &mockResponseWriter{writeMsgError: errors.New("Mock writeMsgError")}
 	q := &dns.Msg{}
 	q.SetQuestion("example.com.", dns.TypeNS)
@@ -203,7 +202,7 @@ func TestServerTruncation(t *testing.T) {
 	resolver.rMeta.PayloadSize = resolver.response.Len() // This is what server looks at for msg length
 
 	// Test for no truncate case as transport is TCP
-	s := &server{remote: resolver, transport: "tcp"} // Should *NOT* truncate as transport is TCP
+	s := &server{stdout: stdout, remote: resolver, transport: "tcp"} // Should *NOT* truncate as transport is TCP
 	mw := &mockResponseWriter{}
 	q := &dns.Msg{}
 	q.SetQuestion("example.com.", dns.TypeNS)
