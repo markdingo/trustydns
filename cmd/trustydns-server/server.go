@@ -99,7 +99,7 @@ func (t *server) start(tlsConfig *tls.Config, errorChan chan error, wg *sync.Wai
 		Addr:      t.listenAddress,
 		ErrorLog:  log.New(&httpLogCapture{server: t, stdout: t.stdout, logit: cfg.logTLSErrors}, "", 0),
 		Handler:   t.newRouter(),
-		TLSConfig: tlsConfig,
+		TLSConfig: tlsConfig.Clone(),
 	}
 
 	t.connTrk = connectiontracker.New(t.listenName())
