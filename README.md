@@ -8,6 +8,7 @@ non-standard features which can be optionally enabled.
 
 [![Build Status](https://travis-ci.org/markdingo/trustydns.svg?branch=master)](https://travis-ci.org/markdingo/trustydns)
 [![Go Report Card](https://goreportcard.com/badge/github.com/markdingo/trustydns)](https://goreportcard.com/report/github.com/markdingo/trustydns)
+[![codecov](https://codecov.io/gh/markdingo/trustydns/branch/master/graph/badge.svg)](https://codecov.io/gh/markdingo/trustydns)
 
 ## Programs
 
