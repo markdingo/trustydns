@@ -57,29 +57,29 @@ var mainTestCases = []mainTestCase{
 		[]string{"Starting", "Exiting"}, ""},
 
 	{"Good tls files",
-		false, 100 * time.Millisecond, []string{"-v", "-A", "127.0.0.1:63081",
+		false, 100 * time.Millisecond, []string{"-v", "-A", "127.0.0.1:63083",
 			"--tls-cert", "testdata/server.cert", "--tls-key", "testdata/server.key"},
 		[]string{"Starting", "Exiting"}, ""},
 
 	{"Good local resolver config",
-		false, 100 * time.Millisecond, []string{"-v", "-A", "127.0.0.1:63081", "-c", "testdata/resolv.conf"},
+		false, 100 * time.Millisecond, []string{"-v", "-A", "127.0.0.1:63084", "-c", "testdata/resolv.conf"},
 		[]string{"Starting", "Exiting"}, ""},
 
 	{"Good profile files",
 		false, 100 * time.Millisecond, []string{"--cpu-profile", "testdata/cpu",
-			"--mem-profile", "testdata/mem", "-v", "-A", "127.0.0.1:63081", "-c", "testdata/resolv.conf"},
+			"--mem-profile", "testdata/mem", "-v", "-A", "127.0.0.1:63085", "-c", "testdata/resolv.conf"},
 		[]string{"Starting", "Exiting"}, ""},
 
 	{"Logging",
 		false, 100 * time.Millisecond,
-		[]string{"-v", "--log-all", "-A", "127.0.0.1:63081", "-c", "testdata/resolv.conf"},
+		[]string{"-v", "--log-all", "-A", "127.0.0.1:63086", "-c", "testdata/resolv.conf"},
 		[]string{"Starting", "Exiting"}, ""},
 
 	{"Wildcard listen address - may not work on some systems",
 		true, time.Millisecond, []string{}, []string{}, ""},
 
 	{"Status report",
-		false, 2 * time.Second, []string{"-v", "-i", "1s", "-A", "127.0.0.1:63081"},
+		false, 2 * time.Second, []string{"-v", "-i", "1s", "-A", "127.0.0.1:63087"},
 		[]string{"Listening: (HTTP on"}, ""},
 }
 
@@ -133,11 +133,11 @@ func TestMain(t *testing.T) {
 // waitForMainExecute is a helper routine which makes sure that main mainExecute() function starts up and
 // terminates as expected. If not, t.Fatal()
 func waitForMainExecute(t *testing.T, howLong time.Duration) error {
-	for ix := 0; ix < 10; ix++ { // Wait for up to one second for main to get running
+	for ix := 0; ix < 10; ix++ { // Wait for up to two seconds for main to get running
 		if isMain(Started) {
 			break
 		}
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Millisecond * 200)
 	}
 	if !isMain(Started) {
 		return fmt.Errorf("mainStarted did not get set after a second for %s", t.Name())

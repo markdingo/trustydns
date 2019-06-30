@@ -72,6 +72,7 @@ func main() {
 }
 
 func mainExecute(args []string) int {
+	defer mainState(Stopped) // Tell testers we've stopped even on error returns
 	flagSet = flag.NewFlagSet(args[0], flag.ContinueOnError)
 	flagSet.SetOutput(stderr)
 	err := parseCommandLine(args)

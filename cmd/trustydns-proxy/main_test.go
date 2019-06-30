@@ -52,32 +52,32 @@ var mainTestCases = []mainTestCase{
 			"--ecs-set", "10.0.120.0/24", "http://localhost:63080"}, []string{"Starting"}, ""},
 
 	{"ecs-request-prefix",
-		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63081", "-v",
+		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63082", "-v",
 			"--ecs-request-ipv4-prefixlen", "20", "--ecs-request-ipv6-prefixlen", "56",
 			"http://localhost:63080"}, []string{"Starting"}, ""},
 
 	{"URL mangling", // Silently runs with a mangled URL
-		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63081", "localhost"}, []string{}, ""},
+		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63083", "localhost"}, []string{}, ""},
 
 	{"URL syntax", // Silently runs with a dodgy (but legal) URL
-		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63081", "///localhost"}, []string{}, ""},
+		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63084", "///localhost"}, []string{}, ""},
 
 	{"Good URL with scheme",
-		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63081", "-v", "http://localhost"},
+		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63085", "-v", "http://localhost"},
 		[]string{"Starting", "Exiting"}, ""},
 
 	{"Good URL No Scheme",
-		false, 100 * time.Millisecond, []string{"-g", "-v", "-A", "127.0.0.1:63081", "localhost"},
+		false, 100 * time.Millisecond, []string{"-g", "-v", "-A", "127.0.0.1:63086", "localhost"},
 		[]string{"Starting", "Exiting"}, ""},
 
 	{"Good local resolver config",
-		false, 100 * time.Millisecond, []string{"-v", "-A", "127.0.0.1:63081",
+		false, 100 * time.Millisecond, []string{"-v", "-A", "127.0.0.1:63087",
 			"-c", "testdata/resolv.conf", "http://localhost"},
 		[]string{"Starting", "Exiting"}, ""},
 
 	{"log-all",
 		false, 100 * time.Millisecond,
-		[]string{"-v", "--log-all", "-A", "127.0.0.1:63081",
+		[]string{"-v", "--log-all", "-A", "127.0.0.1:63088",
 			"-c", "testdata/resolv.conf", "http://localhost"},
 		[]string{"Starting", "Exiting"}, ""},
 
@@ -85,14 +85,14 @@ var mainTestCases = []mainTestCase{
 		true, 100 * time.Millisecond, []string{"http://localhost"}, []string{}, ""},
 
 	{"Status report",
-		false, 2 * time.Second, []string{"-v", "-i", "1s", "-A", "127.0.0.1:63081", "http://localhost"},
+		false, 2 * time.Second, []string{"-v", "-i", "1s", "-A", "127.0.0.1:63089", "http://localhost"},
 		[]string{"Status Server:"}, ""},
 
 	{"CPU Profile",
-		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63081", "--cpu-profile", "testdata/cpu",
+		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63090", "--cpu-profile", "testdata/cpu",
 			"http://localhost"}, []string{}, ""},
 	{"Mem Profile",
-		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63081", "--mem-profile", "testdata/mem",
+		false, 100 * time.Millisecond, []string{"-A", "127.0.0.1:63091", "--mem-profile", "testdata/mem",
 			"http://localhost"}, []string{}, ""},
 }
 
@@ -116,6 +116,8 @@ func TestMain(t *testing.T) {
 			ec := mainExecute(args)
 			e := <-done // Get waitForMainExecute results
 			if e != nil {
+				t.Log("wfmeO:", out.String())
+				t.Log("wfmeE:", err.String())
 				t.Fatal(e)
 			}
 			if ec == 0 && tc.willRunFor == 0 {
@@ -210,7 +212,7 @@ func waitForMainExecute(t *testing.T, howLong time.Duration) error {
 		time.Sleep(time.Millisecond * 200)
 	}
 	if !isMain(Stopped) {
-		return fmt.Errorf("mainStopped did not get set two seconds after mainStarted")
+		return fmt.Errorf("mainStopped did not get set two seconds after stopMain() call for %s", t.Name())
 	}
 
 	return nil
