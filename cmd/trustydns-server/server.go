@@ -94,12 +94,19 @@ func (t *httpLogCapture) Write(data []byte) (int, error) {
 }
 
 // start starts up a HTTP/HTTPS Server and writes to errorChan at server exit.
+//
+// tlsConfig is modified by the h2 start-up code prior to net/http cloning it. The code comment in
+// "type Server struct" says "this value is cloned by ServeTLS and ListenAndServeTLS" but it doesn't
+// say it does so *prior* to modification thus we cannot share a common tlsConfig across servers
+// otherwise we create a race.
 func (t *server) start(tlsConfig *tls.Config, errorChan chan error, wg *sync.WaitGroup) {
 	t.server = &http.Server{
-		Addr:      t.listenAddress,
-		ErrorLog:  log.New(&httpLogCapture{server: t, stdout: t.stdout, logit: cfg.logTLSErrors}, "", 0),
-		Handler:   t.newRouter(),
-		TLSConfig: tlsConfig.Clone(),
+		Addr:     t.listenAddress,
+		ErrorLog: log.New(&httpLogCapture{server: t, stdout: t.stdout, logit: cfg.logTLSErrors}, "", 0),
+		Handler:  t.newRouter(),
+	}
+	if tlsConfig != nil {
+		t.server.TLSConfig = tlsConfig.Clone()
 	}
 
 	t.connTrk = connectiontracker.New(t.listenName())
