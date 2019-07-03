@@ -195,23 +195,23 @@ func TestUSR1(t *testing.T) {
 // terminates as expected. If not, t.Fatal()
 func waitForMainExecute(t *testing.T, howLong time.Duration) error {
 	for ix := 0; ix < 10; ix++ { // Wait for up to two seconds for main to get running
-		if isMain(Started) {
+		if isMain(started) {
 			break
 		}
 		time.Sleep(time.Millisecond * 200)
 	}
-	if !isMain(Started) {
+	if !isMain(started) {
 		return fmt.Errorf("mainStarted did not get set after two seconds")
 	}
 	time.Sleep(howLong)          // Give it the designated time to complete
 	stopMain()                   // Then ask it to finished up
 	for ix := 0; ix < 10; ix++ { // Wait for up to two seconds for main to terminate
-		if isMain(Stopped) {
+		if isMain(stopped) {
 			break
 		}
 		time.Sleep(time.Millisecond * 200)
 	}
-	if !isMain(Stopped) {
+	if !isMain(stopped) {
 		return fmt.Errorf("mainStopped did not get set two seconds after stopMain() call for %s", t.Name())
 	}
 

@@ -5,10 +5,12 @@ import (
 	"time"
 )
 
+// Name implements the reporter interface
 func (t *Tracker) Name() string {
 	return "Conn Track"
 }
 
+// Name Report implements the reporter interface
 func (t *Tracker) Report(resetCounters bool) string {
 	t.mu.Lock()
 	defer t.mu.Unlock()

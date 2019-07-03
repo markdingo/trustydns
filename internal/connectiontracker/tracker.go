@@ -1,5 +1,5 @@
 /*
-connectiontracker track connections for statistical purposes - ostensibly for inbound HTTP2
+Package connectiontracker track connections for statistical purposes - ostensibly for inbound HTTP2
 connections - but it is a generic package that should apply to other connections. The goal is to
 determine occupancy and concurrency on a per-listen-address basis and within a given connection for
 those connections which support sessions.

@@ -20,6 +20,7 @@ import (
 	"sync"
 )
 
+// Counter is the core structure used by concurrencytracker
 type Counter struct {
 	sync.Mutex
 	current int // Count of pending Done() calls

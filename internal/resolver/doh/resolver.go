@@ -1,8 +1,8 @@
 /*
-Package internal/resolver/doh is a resolver implementation which handles (DoH) lookups via remote servers
+Package doh (aka) internal/resolver/doh is a resolver implementation which handles (DoH) lookups via
+remote servers.
 
-Typical usage is pretty straightforward. Create the resolver once
-then use it to resolve dns.Msgs.
+Typical usage is pretty straightforward. Create the resolver once then use it to resolve dns.Msgs.
 
 
      res, err := dohresolver.New(dohresolver.Config{....}, &http.Client)

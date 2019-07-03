@@ -8,14 +8,14 @@ import (
 type mainStateType int
 
 const (
-	Initial mainStateType = iota // Never been started
-	Started                      // Running
-	Stopped                      // Previously started, now stopped
+	initial mainStateType = iota // Never been started
+	started                      // Running
+	stopped                      // Previously started, now stopped
 )
 
 var (
 	stateMutex sync.Mutex
-	state      mainStateType = Initial
+	state      mainStateType = initial
 )
 
 func mainState(newState mainStateType) {

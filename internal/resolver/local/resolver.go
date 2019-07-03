@@ -1,4 +1,5 @@
-// Package internal/resolver/local is a resolver implementation which handle local lookups via /etc/resolv.conf
+// Package local (aka internal/resolver/local) is a resolver implementation which handle local
+// lookups via /etc/resolv.conf. It more-or-less implements res_send(3).
 package local
 
 import (

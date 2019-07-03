@@ -61,7 +61,7 @@ func mainInit(out io.Writer, err io.Writer) {
 	cfg = &config{}
 	stdout = out
 	stderr = err
-	mainState(Initial)
+	mainState(initial)
 	stopChannel = make(chan os.Signal, 4) // All reasonable signals cause us to quit or stats report
 	signal.Notify(stopChannel, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGUSR1)
 }
@@ -72,7 +72,7 @@ func main() {
 }
 
 func mainExecute(args []string) int {
-	defer mainState(Stopped) // Tell testers we've stopped even on error returns
+	defer mainState(stopped) // Tell testers we've stopped even on error returns
 	flagSet = flag.NewFlagSet(args[0], flag.ContinueOnError)
 	flagSet.SetOutput(stderr)
 	err := parseCommandLine(args)
@@ -246,7 +246,7 @@ func mainExecute(args []string) int {
 
 	// Loop forever giving periodic status reports and checking for a termination event.
 
-	mainState(Started) // Tell testers we're up and running
+	mainState(started) // Tell testers we're up and running
 	nextStatusIn := nextInterval(time.Now(), cfg.statusInterval)
 
 Running:
@@ -278,7 +278,7 @@ Running:
 	for _, s := range servers {
 		s.stop()
 	}
-	mainState(Stopped) // Tell testers we've stopped accepting requests
+	mainState(stopped) // Tell testers we've stopped accepting requests
 	wg.Wait()          // Wait for all servers to completely shut down
 
 	if cfg.verbose {
