@@ -1,4 +1,4 @@
-## DNS Over HTTPS proxy, server and query programs
+# DNS Over HTTPS proxy, server and query programs
 
 Trustydns is a DNS Over HTTPS (DoH) package written in Go. The proxy and server programs can be
 combined to create a completely independent DoH eco-system or they can be mixed and matched
@@ -66,7 +66,7 @@ programs have been tested on various CPU architectures with FreeBSD, Linux and m
 To fetch, compile and install trustydns, run the following commands:
 
 ```sh
-go get github.com/markdingo/trustydns   # Ignore the warning about no go programs
+go get -d -u github.com/markdingo/trustydns     # Ignore the warning about no go programs
 
 cd $GOPATH/src/github.com/markdingo/trustydns
 
