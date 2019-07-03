@@ -258,7 +258,7 @@ func usage(out io.Writer) {
 func parseCommandLine(args []string) error {
 	flagSet.BoolVar(&cfg.dohConfig.UseGetMethod, "g", false, "Use HTTP GET with the 'dns' query parameter (instead of POST)")
 	flagSet.BoolVar(&cfg.help, "h", false, "Print usage message to Stdout then exit(0)")
-	flagSet.BoolVar(&cfg.dohConfig.GeneratePadding, "p", true, "Add RFC8467 recommended padding to queries")
+	flagSet.BoolVar(&cfg.dohConfig.GeneratePadding, "p", false, "Add RFC8467 recommended padding to queries (breaks some resolvers)")
 	flagSet.BoolVar(&cfg.verbose, "v", false, "Verbose status and stats - otherwise only errors are output")
 
 	flagSet.Var(&cfg.listenAddresses, "A",
