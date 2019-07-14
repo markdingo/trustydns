@@ -76,3 +76,9 @@ freebsd64: clean
 	@echo Building for amd64 FreeBSD
 	@GOOS=freebsd GOARCH=amd64 $(MAKE) all
 	@file $(commands)
+
+.PHONY: windows
+windows: clean
+	@echo Building for amd64 Windows
+	@GOOS=windows GOARCH=amd64 $(MAKE) all
+	@file $(commands)
