@@ -1,3 +1,5 @@
+// +build unix !windows
+
 // osutil is a helper package to abstract OS interactions. In particular constraining a process via
 // chroot, setsid and setgid. Most of this functionality is disabled for Linux.
 

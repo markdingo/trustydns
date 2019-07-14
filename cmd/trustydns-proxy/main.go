@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"os/signal"
 	"runtime"
 	"runtime/pprof"
 	"sort"
@@ -71,7 +70,7 @@ func mainInit(out io.Writer, err io.Writer) {
 	stderr = err
 	mainState(initial)
 	stopChannel = make(chan os.Signal, 4) // All reasonable signals cause us to quit or stats report
-	signal.Notify(stopChannel, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGUSR1)
+	osutil.SignalNotify(stopChannel)
 }
 
 func main() {
@@ -314,7 +313,7 @@ Running:
 	for {
 		select {
 		case s := <-stopChannel:
-			if s == syscall.SIGUSR1 {
+			if osutil.IsSignalUSR1(s) {
 				statusReport("User1", false, reporters)
 				break
 			}
