@@ -6,7 +6,6 @@ import (
 	"os"
 )
 
-// SignalNotify sends all the main Unix signals to the supplied channel
 func SignalNotify(c chan os.Signal) {
 }
 

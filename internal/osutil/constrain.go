@@ -35,6 +35,8 @@ const (
 // Arguable we should also consider setsid and closing all un-needed file descriptors, but this is a
 // reasonable start for this application. It is also the case that apparently everyone re-writes
 // this function and most get it wrong, so I may have too...
+//
+// This function is limited on Linux and a noop on Windows.
 func Constrain(userName, groupName, chrootDir string) error {
 
 	// Step 1: Convert symbolic names to ids
@@ -120,7 +122,8 @@ func Constrain(userName, groupName, chrootDir string) error {
 }
 
 // ConstraintReport returns a printable string showing the uid/gid/cwd of the process. Normally
-// called after Constrain() to "prove" that the process has been downgraded.
+// called after Constrain() to "prove" that the process has been downgraded. This function is a
+// noop on Windows.
 func ConstraintReport() string {
 	uid := os.Getuid()
 	gid := os.Getgid()
