@@ -42,7 +42,7 @@ func Constrain(userName, groupName, chrootDir string) error {
 	if len(userName) > 0 {
 		u, err := user.Lookup(userName)
 		if err != nil {
-			return fmt.Errorf(me+"Lookup failed: %s", err.Error())
+			return fmt.Errorf(me+"User name lookup failed: %s", err.Error())
 		}
 		uid, err = strconv.Atoi(u.Uid)
 		if err != nil {
@@ -54,7 +54,7 @@ func Constrain(userName, groupName, chrootDir string) error {
 	if len(groupName) > 0 {
 		g, err := user.LookupGroup(groupName)
 		if err != nil {
-			return fmt.Errorf(me+"Could not look up group: %s: %s", groupName, err.Error())
+			return fmt.Errorf(me+"Group name lookup failed: %s", err.Error())
 		}
 		gid, err = strconv.Atoi(g.Gid)
 		if err != nil {
