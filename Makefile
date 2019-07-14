@@ -13,6 +13,7 @@ commands=cmd/trustydns-server/trustydns-server cmd/trustydns-proxy/trustydns-pro
 targets:
 	@echo "Installation targets: 'updatepackages' 'clean', 'all', and 'install'"
 	@echo "Developer targets: 'clean', 'fmt' and 'test'"
+	@echo "Cross-platform targets: 'mips64', 'debian64', 'pi3b', 'freebsd64', 'windowsamd64', and 'windows386'"
 
 .PHONY: all
 all:	$(commands)
@@ -77,8 +78,12 @@ freebsd64: clean
 	@GOOS=freebsd GOARCH=amd64 $(MAKE) all
 	@file $(commands)
 
-.PHONY: windows
-windows: clean
+.PHONY: windowsamd64
+windowsamd64: clean
 	@echo Building for amd64 Windows
 	@GOOS=windows GOARCH=amd64 $(MAKE) all
-	@file $(commands)
+
+.PHONY: windows386
+windows386: clean
+	@echo Building for 386 Windows
+	@GOOS=windows GOARCH=386 $(MAKE) all

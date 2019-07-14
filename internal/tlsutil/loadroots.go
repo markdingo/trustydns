@@ -17,7 +17,7 @@ func loadroots(useSystemRoots bool, otherCAFiles []string) (*x509.CertPool, erro
 		var err error
 		pool, err = x509.SystemCertPool()
 		if err != nil {
-			return nil, fmt.Errorf("tlsutil:loadroots failed: %s", err.Error())
+			return nil, fmt.Errorf("tlsutil:loadroots:systemRoots failed: %s", err.Error())
 		}
 	} else {
 		pool = x509.NewCertPool()
@@ -28,11 +28,11 @@ func loadroots(useSystemRoots bool, otherCAFiles []string) (*x509.CertPool, erro
 	for _, caFile := range otherCAFiles {
 		asn1Data, err := ioutil.ReadFile(caFile)
 		if err != nil {
-			return nil, fmt.Errorf("tlsutil:loadroots failed: %s", err.Error())
+			return nil, fmt.Errorf("tlsutil:loadroots:otherCA failed: %s", err.Error())
 		}
 
 		if !pool.AppendCertsFromPEM(asn1Data) {
-			return nil, fmt.Errorf("tlsutil:loadroots failed to add %s", caFile)
+			return nil, fmt.Errorf("tlsutil:loadroots:appendCerts failed to add %s", caFile)
 		}
 	}
 
