@@ -1,4 +1,4 @@
-# DNS Over HTTPS proxy, server and query programs
+## DNS Over HTTPS proxy, server and query programs
 
 Trustydns is a DNS Over HTTPS (DoH) package written in Go. The proxy and server programs can be
 combined to create a completely independent DoH eco-system or they can be mixed and matched
@@ -10,7 +10,7 @@ non-standard features which can be optionally enabled.
 [![Go Report Card](https://goreportcard.com/badge/github.com/markdingo/trustydns)](https://goreportcard.com/report/github.com/markdingo/trustydns)
 [![codecov](https://codecov.io/gh/markdingo/trustydns/branch/master/graph/badge.svg)](https://codecov.io/gh/markdingo/trustydns)
 
-## Programs
+### Programs
 
 The `trustydns-proxy` daemon accepts regular DNS queries and forwards them to a DoH server over
 HTTPS. Typically `trustydns-proxy` is installed on your home or office gateway and replaces your
@@ -20,7 +20,7 @@ resolver. It is normally installed on a remote, trusted system which has access 
 resolver. Finally, the `trustydns-dig` command-line utility issues DoH queries and can be used to
 test DoH servers.
 
-## Anticipated deployment
+### Anticipated deployment
 
 While these programs can be mixed and matched with existing DoH infrastructure such as those
 provided by Quad9 and Mozilla, the intent is to let you create your own DoH eco-system independent
@@ -39,7 +39,7 @@ Additional deployment features which may be of interest include:
  * Support for alternate root CAs to enable private certificates
  * Proxy support for a pool of DoH servers so no single point of failure
 
-## Caveats
+### Caveats
 
 Trustydns is new and has some rough edges to it. It does not yet use `go mod` to manage dependencies
 (fortuitously there are few package dependencies) and the compilation and installation process is
@@ -56,7 +56,7 @@ The alternate root CA support is definitely "primordial". Let's see how useful i
 too much of a meal out of it. It may turn out that this feature is more hassle than it's worth in
 which case it may be removed in a future release.
 
-## Installation
+### Installation
 
 This package should compile and run on most Unix-like systems which support go1.12.1 or higher. All
 programs have been tested on various CPU architectures with FreeBSD, Linux and macOS. The
@@ -75,7 +75,7 @@ make clean all             # Compile everything
 sudo make install          # Install programs into /usr/local
 ```
 
-## Getting Started
+### Getting Started
 
 The proxy and server daemons are designed to be run by a process supervision manager such as
 [daemontools](http://cr.yp.to/daemontools.html), launchd, runit or systemd; how you do this is up to
@@ -113,7 +113,7 @@ If you've got this far, congratulations! You've successfully run all the program
 to deploy.
 
 
-## Server Certificate
+### Server Certificate
 
 As you no doubt observed in "Getting Started", all the programs can use HTTP which expedites the
 learning exercise and greatly simplfies traffic debugging. However if you plan to run
@@ -129,9 +129,9 @@ route there are a few scripts in the [openssl](./openssl) directory which might 
 If you plan to run a "proxy only" deployment which relies on existing DoH Servers you will of course
 not need a Server Certificate.
 
-## Deployments Scenarios
+### Deployments Scenarios
 
-### A Proxy-only Deployment
+#### A Proxy-only Deployment
 
 One possible deployment scenario is to use `trustydns-proxy` on your local network and direct its
 DoH queries to public DoH servers such as those run by Mozilla and Quad9. To do this invoke the proxy
@@ -151,7 +151,7 @@ list can be found on the [Curl GitHub site](https://github.com/curl/curl/wiki/DN
 that at the time of writing, Google do *not* run a public RFC8484 compliant DNS Over HTTPS
 server. They run a DNS Over HTTPS API of their own invention which is not supported by trustydns.
 
-### A Proxy deployment with split-DNS
+#### A Proxy deployment with split-DNS
 
 It's not un-common for a network to have a "split-DNS" whereby lookups of your local domain produce
 different results from those seen by the "outside" world. This is usually achieved with a special
@@ -176,7 +176,7 @@ line. Redirection to local resolvers also includes all sub-domains of the specif
 resolv.conf file otherwise redirected queries will cause an unpleasant query loop.
 
 
-### Private Proxy and Server Deployment
+#### Private Proxy and Server Deployment
 
 A private proxy/server deployment is one in which both the proxy and server use privately generated
 certificates to authorize access to each other. If we assume that you have previously generated a
@@ -205,20 +205,27 @@ Setting `--tls-use-system-roots=false` retricts access solely to certificates ge
 root CA.
 
 
-## Reporting Tools
+### Reporting Tools
 
 In verbose mode (-v) both the server and the proxy produce periodic statistical output which is
 normally written to log files. There are a number of scripts in the [tools](./tools) directory which
 produce summary reports from the log file entries. For details see [tools/README](tools/README.md).
 
 
-## Other Documents
+### Other Documents
 
 There are various ancilliary documents in the [docs](docs/.) directory which cover more obscure
 aspects of running trustydns.  They cover things like how to build and configure
 [unbound](https://nlnetlabs.nl/projects/unbound) to support ECS queries and how to enable ECS
 synthesis to improve GSLB responses.
 
-## Copyright and License
+### Community
+
+If you have any problems using trustydns or suggestions on how it can do a better job, don't
+hesitate to create an [issue](https://github.com/markdingo/trustydns/issues) or email the
+[authors](https://github.com/markdingo/trustydns/blob/master/AUTHORS) directly. This package can
+only improve with your feedback.
+
+### Copyright and License
 
 Trustydns is Copyright :copyright: 2019 Mark Delany. This software  is licensed under the BSD 2-Clause "Simplified" License.
