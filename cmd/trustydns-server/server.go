@@ -278,7 +278,7 @@ func (t *server) serveDoH(writer http.ResponseWriter, httpReq *http.Request) {
 
 	// Return message to caller
 
-	duration := time.Now().Sub(startTime)
+	duration := time.Since(startTime)
 	writer.Header().Set(consts.ContentTypeHeader, consts.Rfc8484AcceptValue)
 	writer.Header().Set(consts.TrustyDurationHeader, duration.String())
 
