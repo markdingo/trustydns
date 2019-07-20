@@ -308,7 +308,7 @@ func nextInterval(now time.Time, interval time.Duration) time.Duration {
 // upTime calculates how long this server has been running and returns log-friendly and
 // granularity-appropriate representation of that duration.
 func uptime() string {
-	return time.Now().Sub(startTime).Truncate(time.Second).String()
+	return time.Since(startTime).Truncate(time.Second).String()
 }
 
 // statusReport prints stats about the server and all known reporters
