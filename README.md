@@ -134,12 +134,13 @@ not need a Server Certificate.
 #### A Proxy-only Deployment
 
 One possible deployment scenario is to use `trustydns-proxy` on your local network and direct its
-DoH queries to public DoH servers such as those run by Mozilla and Quad9. To do this invoke the proxy
-as follows:
+DoH queries to public DoH servers such as those run by Mozilla, Quad9 and Google. To do this invoke
+the proxy as follows:
 
 ```sh
 /usr/local/sbin/trustydns-proxy -v https://mozilla.cloudflare-dns.com/dns-query \
-                                   https://dns.quad9.net/dns-query
+                                   https://dns.quad9.net/dns-query \
+                                   https://dns.google/dns-query
 ```
 
 The proxy accepts DNS queries on port 53 and forward them to one of the servers on the command line
@@ -147,9 +148,7 @@ depending on which is offering reliable responses with the lowest latency. `trus
 opportunistically forwards queries to different servers to accumulate latency and reliability data.
 
 There are other public DoH servers besides those run by Mozilla and Quad9. A fairly comprehensive
-list can be found on the [Curl GitHub site](https://github.com/curl/curl/wiki/DNS-over-HTTPS). Note
-that at the time of writing, Google do *not* run a public RFC8484 compliant DNS Over HTTPS
-server. They run a DNS Over HTTPS API of their own invention which is not supported by trustydns.
+list can be found on the [Curl GitHub site](https://github.com/curl/curl/wiki/DNS-over-HTTPS).
 
 #### A Proxy deployment with split-DNS
 
@@ -164,7 +163,8 @@ invocation:
 /usr/local/sbin/trustydns-proxy -v -c /etc/resolv.conf \
                                    -e example.net -e 168.192.in-addr.arpa \
                                    https://mozilla.cloudflare-dns.com/dns-query \
-                                   https://dns.quad9.net/dns-query
+                                   https://dns.quad9.net/dns-query \
+                                   https://dns.google/dns-query
 ```
 
 This invocation causes `trustydns-proxy` to redirect all queries for the search/domains in
