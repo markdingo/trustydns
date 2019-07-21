@@ -147,8 +147,9 @@ The proxy accepts DNS queries on port 53 and forward them to one of the servers 
 depending on which is offering reliable responses with the lowest latency. `trustydns-proxy`
 opportunistically forwards queries to different servers to accumulate latency and reliability data.
 
-There are other public DoH servers besides those run by Mozilla and Quad9. A fairly comprehensive
-list can be found on the [Curl GitHub site](https://github.com/curl/curl/wiki/DNS-over-HTTPS).
+There are many other public DoH servers besides those used in the example above. A fairly
+comprehensive list along with their attributes can be found on the [Curl
+GitHub](https://github.com/curl/curl/wiki/DNS-over-HTTPS) site.
 
 #### A Proxy deployment with split-DNS
 
