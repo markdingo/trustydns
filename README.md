@@ -214,10 +214,10 @@ produce summary reports from the log file entries. For details see [tools/README
 
 ### Other Documents
 
-There are various ancilliary documents in the [docs](docs/.) directory which cover more obscure
-aspects of running trustydns.  They cover things like how to build and configure
-[unbound](https://nlnetlabs.nl/projects/unbound) to support ECS queries and how to enable ECS
-synthesis to improve GSLB responses.
+There are various ancilliary documents in the [docs](docs/.) directory which cover less common
+aspects of running trustydns. They include: running on Windows, implications of edns-client-subnet
+with DoH and how to build and configure [unbound](https://nlnetlabs.nl/projects/unbound) to support ECS
+queries and how to enable ECS synthesis to improve GSLB responses.
 
 ### Community
 

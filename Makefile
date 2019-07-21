@@ -13,7 +13,7 @@ commands=cmd/trustydns-server/trustydns-server cmd/trustydns-proxy/trustydns-pro
 targets:
 	@echo "Installation targets: 'updatepackages' 'clean', 'all', and 'install'"
 	@echo "Developer targets: 'clean', 'fmt' and 'test'"
-	@echo "Cross-platform targets: 'mips64', 'debian64', 'pi3b', 'freebsd64', 'windowsamd64', and 'windows386'"
+	@echo "Cross-platform targets: 'mips64', 'debian64', 'pi3b', 'freebsd64', 'windowsamd64' and 'windows386'"
 
 .PHONY: all
 all:	$(commands)
