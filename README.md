@@ -229,4 +229,4 @@ only improve with your feedback.
 
 ### Copyright and License
 
-Trustydns is Copyright :copyright: 2019 Mark Delany. This software  is licensed under the BSD 2-Clause "Simplified" License.
+Trustydns is Copyright :copyright: 2019, 2020 Mark Delany. This software  is licensed under the BSD 2-Clause "Simplified" License.
