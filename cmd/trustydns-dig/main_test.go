@@ -29,10 +29,10 @@ var mainTestCases = []testCase{
 
 	// These tests may or may not work depending on whether the public server is accessible
 
-	{[]string{"https://mozilla.cloudflare-dns.com/dns-query", "swcdn.g.aaplimg.com"},
+	{[]string{"https://mozilla.cloudflare-dns.com/dns-query", "time-osx.g.aaplimg.com"},
 		[]string{"Query Time", "17.", "status: NOERROR"}, ""},
-	{[]string{"--short", "https://mozilla.cloudflare-dns.com/dns-query", "swcdn.g.aaplimg.com"},
-		[]string{"swcdn.g.aaplimg.com", "IN", "17."}, ""},
+	{[]string{"--short", "https://mozilla.cloudflare-dns.com/dns-query", "time-osx.g.aaplimg.com"},
+		[]string{"time-osx.g.aaplimg.com", "IN", "17."}, ""},
 }
 
 func TestMain(t *testing.T) {
