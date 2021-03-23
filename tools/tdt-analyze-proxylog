@@ -16,7 +16,7 @@ use Getopt::Std;
 # change occurs without *some* changes to the stats reporting. At least in the early stages of this
 # package.
 
-my $expectedVersion = "v0.1.0";
+my $expectedVersion = "v0.2.1";
 my $currentVersion = "";
 
 ##########

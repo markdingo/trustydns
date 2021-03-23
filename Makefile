@@ -11,7 +11,7 @@ cmddirs=cmd/trustydns-dig cmd/trustydns-proxy cmd/trustydns-server
 commands=cmd/trustydns-server/trustydns-server cmd/trustydns-proxy/trustydns-proxy cmd/trustydns-dig/trustydns-dig
 
 targets:
-	@echo "Installation targets: 'updatepackages' 'clean', 'all', and 'install'"
+	@echo "Installation targets: 'clean', 'all', and 'install'"
 	@echo "Developer targets: 'clean', 'fmt' and 'test'"
 	@echo "Cross-platform targets: 'mips64', 'debian64', 'pi3b', 'freebsd64', 'windowsamd64' and 'windows386'"
 
@@ -40,12 +40,6 @@ critic:
 .PHONY: fmt
 fmt:
 	gofmt -s -w `find . -name '*.go' -type f -print`
-
-.PHONY: updatepackages
-updatepackages:
-	go get -u golang.org/x/net/http2
-	go get -u github.com/miekg/dns
-	go get -u golang.org/x/sys/unix
 
 .PHONY: install
 install: $(commands)
