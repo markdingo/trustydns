@@ -7,9 +7,6 @@ go:
 before_install:
   - go get -t -v ./...
 
-before_script:
-  - make updatepackages
-
 script:
   - go test -race -coverprofile=coverage.txt -covermode=atomic ./...
 

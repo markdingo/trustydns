@@ -70,7 +70,6 @@ go get -d -u github.com/markdingo/trustydns     # Ignore the warning about no go
 
 cd $GOPATH/src/github.com/markdingo/trustydns
 
-make updatepackages        # Make sure dependent Go packages are installed and current
 make clean all             # Compile everything
 sudo make install          # Install programs into /usr/local
 ```
