@@ -41,9 +41,8 @@ Additional deployment features which may be of interest include:
 
 ### Caveats
 
-Trustydns is new and has some rough edges to it. It does not yet use `go mod` to manage dependencies
-(fortuitously there are few package dependencies) and the compilation and installation process is
-simplistic at best.
+Trustydns is new and has some rough edges to it and the compilation and installation process is
+simplistic at best, so bug reports, suggestions and feedback are more than welcome.
 
 This package is targeted at DNS administrators with a modicum of Unix sysadmin experience. You need
 not be an expert to deploy trustydns but there are many different ways a DoH installation can be
