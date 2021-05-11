@@ -114,7 +114,7 @@ to deploy.
 ### Server Certificate
 
 As you no doubt observed in "Getting Started", all the programs can use HTTP which expedites the
-learning exercise and greatly simplfies traffic debugging. However if you plan to run
+learning exercise and greatly simplifies traffic debugging. However if you plan to run
 `trustydns-server` in production you'll need to acquire a TLS server certificate and invoke
 `trustydns-server` with `--tls-cert` and `--tls-key`.
 
