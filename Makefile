@@ -13,7 +13,7 @@ commands=cmd/trustydns-server/trustydns-server cmd/trustydns-proxy/trustydns-pro
 targets:
 	@echo "Installation targets: 'clean', 'all', and 'install'"
 	@echo "Developer targets: 'clean', 'fmt' and 'test'"
-	@echo "Cross-platform targets: 'mips64', 'debian64', 'pi3b', 'freebsd64', 'windowsamd64' and 'windows386'"
+	@echo "Cross-platform targets: 'mips64', 'debian64', 'pi3b', 'freebsdarm64', 'freebsd64', 'windowsamd64' and 'windows386'"
 
 .PHONY: all
 all:	$(commands)
@@ -62,8 +62,14 @@ debian64: clean
 
 .PHONY: pi3b
 pi3b: clean
-	@echo 'Building for Raspberry Pi Model B (32-bit armv71)'
+	@echo 'Building for Raspberry Pi3 Model B (32-bit armv71)'
 	@GOOS=linux GOARCH=arm $(MAKE) all
+	@file $(commands)
+
+.PHONY: freebsdarm64
+freebsdarm64: clean
+	@echo 'Building for aarch64 Freebsd targets (particularly Pi4 Model B (64-bit armv8)'
+	@GOOS=freebsd GOARCH=arm64 $(MAKE) all
 	@file $(commands)
 
 .PHONY: freebsd64
