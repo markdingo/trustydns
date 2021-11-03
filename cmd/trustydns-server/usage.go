@@ -99,7 +99,7 @@ OPTIONS
           [--tls-other-roots TLS Root Certificate file] ...
           [--tls-use-system-roots]
 
-          [--cpu-profile file] [--mem-profile file]
+          [--gops] [--cpu-profile file] [--mem-profile file]
 
           [--user userName] [--group groupName] [--chroot directory]
 
@@ -162,8 +162,9 @@ func parseCommandLine(args []string) error {
 	flagSet.BoolVar(&cfg.tlsUseSystemRootCAs, "tls-use-system-roots", false,
 		"Validate HTTPS clients with root CAs")
 
-	// go pprof settings
+	// gops and go pprof settings
 
+	flagSet.BoolVar(&cfg.gops, "gops", false, "Start github.com/google/gops agent")
 	flagSet.StringVar(&cfg.cpuprofile, "cpu-profile", "", "write cpu profile to `file`")
 	flagSet.StringVar(&cfg.memprofile, "mem-profile", "", "write mem profile to `file`")
 

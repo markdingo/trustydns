@@ -1,3 +1,4 @@
+//go:build windows || !unix
 // +build windows !unix
 
 package osutil

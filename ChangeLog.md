@@ -1,4 +1,6 @@
 # Trustydns Change Log
+### v0.3.0 -- 2021-11-04
+  * Add --gops flag to server and proxy
 ### v0.2.1 -- 2021-03-23
   * Make sure all version values match - should probably make this more robust
   * Add missing changes to v0.2.0 log entry

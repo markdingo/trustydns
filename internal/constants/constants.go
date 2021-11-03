@@ -60,7 +60,7 @@ func createReadOnlyConstants() {
 		DigProgramName:    "trustydns-dig",
 		ProxyProgramName:  "trustydns-proxy",
 		ServerProgramName: "trustydns-server",
-		Version:           "v0.2.1",
+		Version:           "v0.3.0",
 		PackageName:       "Trusty DNS Over HTTPS",
 		PackageURL:        "https://github.com/markdingo/trustydns",
 		RFC:               "RFC8484",

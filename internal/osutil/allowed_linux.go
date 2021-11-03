@@ -1,3 +1,4 @@
+//go:build linux
 // +build linux
 
 // setuid/setgid don't work on Linux via Go because Linux has a nutty arrangement whereby each thread

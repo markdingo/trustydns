@@ -8,11 +8,12 @@ import (
 )
 
 type config struct {
+	gops    bool
 	help    bool
-	verbose bool
-	version bool
 	tcp     bool // Listen on TCP
 	udp     bool // Listen on UDP
+	verbose bool
+	version bool
 
 	listenAddresses flagutil.StringValue // Listen address for inbound DNS queries
 

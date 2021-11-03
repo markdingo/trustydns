@@ -14,6 +14,8 @@ import (
 	"syscall"
 	"time"
 
+	gops "github.com/google/gops/agent"
+
 	"github.com/markdingo/trustydns/internal/constants"
 	"github.com/markdingo/trustydns/internal/osutil"
 	"github.com/markdingo/trustydns/internal/reporter"
@@ -175,6 +177,12 @@ func mainExecute(args []string) int {
 			return fatal(err)
 		}
 		defer memProfileFile.Close()
+	}
+
+	if cfg.gops {
+		if err := gops.Listen(gops.Options{}); err != nil {
+			return fatal(err)
+		}
 	}
 
 	// Start a server for each listen address

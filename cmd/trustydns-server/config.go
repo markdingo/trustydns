@@ -7,9 +7,10 @@ import (
 )
 
 type config struct {
+	gops              bool
 	help              bool
-	verifyClientCerts bool
 	verbose           bool
+	verifyClientCerts bool
 	version           bool
 
 	listenAddresses flagutil.StringValue // Addresses for inbound HTTP requests

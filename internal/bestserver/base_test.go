@@ -72,7 +72,7 @@ func TestBaseServers(t *testing.T) {
 }
 
 // Test reader/writer lock functions (just wrappers around mutex, but still). Any errors are fatal
-// as the lock is in an indeterminant state.
+// as the lock is in an indeterminate state.
 func TestBaseLocking(t *testing.T) {
 	bm := &baseManager{}
 	err := bm.init(LatencyAlgorithm, []Server{one})

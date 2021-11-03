@@ -1,3 +1,4 @@
+//go:build unix || !windows
 // +build unix !windows
 
 // osutil is a helper package to abstract OS interactions. In particular constraining a process via
