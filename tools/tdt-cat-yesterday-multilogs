@@ -1,12 +1,11 @@
 #! /bin/sh
 
-# Cat all log lines from yesterday from a multilog directory. Typical usage is to feed the output
-# into one of the analyze tools. It assumes that the dtm of the log files are as they when they were
-# created and that the contents are created by multilog and thus amenable to date decoding with
-# tai64nlocal.
+# Cat all log lines from yesterday from a multilog directory. It assumes that the dtm of
+# the log files are as they where when they were created and that the contents are created
+# by multilog and thus amenable to date decoding with tai64nlocal.
 #
-# Typically usage is to feed the output into the corresponding log analysis program,
-# i.e. tdt-analyze-proxylog or tdt-analyze-serverlog. E.g.:
+# Typically usage is to feed the output into a log analysis program such as
+# tdt-analyze-proxylog or tdt-analyze-serverlog. E.g.:
 #
 # tdt-cat-yesterday-multilogs /var/log/trustydns-proxy | tdt-analyze-proxylog
 
