@@ -68,31 +68,33 @@ Report returns a multi-line string showing stats suitable for printing to a log 
 if resetCounters is true.
 
 Totals: req=1273 ok=1273 errs=0 (0/0)
-        ^        ^       ^       ^ ^
-        |        |       |       | |
-        |        |       |       | +--Retry count exceeded
-        |        |       |       +--Timeout limit exceeded
-        |        |       +--Total bad requests
-        |        +--Total good requests
-        +--Total requests
+
+	^        ^       ^       ^ ^
+	|        |       |       | |
+	|        |       |       | +--Retry count exceeded
+	|        |       |       +--Timeout limit exceeded
+	|        |       +--Total bad requests
+	|        +--Total good requests
+	+--Total requests
 
 Server: req=1273 ok=1273 al=0.003 errs=0 (0/0/0/0/0/0) (ev 0/0) 127.0.0.1:53
-        ^        ^       ^        ^       ^ ^ ^ ^ ^ ^   ^  ^ ^  ^
-        |        |       |        |       | | | | | |   |  | |  |
-        |        |       |        |       | | | | | |   |  | |  +--Server
-        |        |       |        |       | | | | | |   |  | +--RFFU
-        |        |       |        |       | | | | | |   |  +--TCP fallback
-        |        |       |        |       | | | | | |   +--Event counters
-        |        |       |        |       | | | | | +--Other rcodes
-        |        |       |        |       | | | | +--Not implemented (Rcode)
-        |        |       |        |       | | | +--Refused (Rcode)
-        |        |       |        |       | | +--Server fail (Rcode)
-        |        |       |        |       | +--Format error (Rcode)
-        |        |       |        |       +--Exchange error
-        |        |       |        +--Total bad requests
-        |        |       +--Average latency
-        |        +--Good requests
-        +---Total requests
+
+	^        ^       ^        ^       ^ ^ ^ ^ ^ ^   ^  ^ ^  ^
+	|        |       |        |       | | | | | |   |  | |  |
+	|        |       |        |       | | | | | |   |  | |  +--Server
+	|        |       |        |       | | | | | |   |  | +--RFFU
+	|        |       |        |       | | | | | |   |  +--TCP fallback
+	|        |       |        |       | | | | | |   +--Event counters
+	|        |       |        |       | | | | | +--Other rcodes
+	|        |       |        |       | | | | +--Not implemented (Rcode)
+	|        |       |        |       | | | +--Refused (Rcode)
+	|        |       |        |       | | +--Server fail (Rcode)
+	|        |       |        |       | +--Format error (Rcode)
+	|        |       |        |       +--Exchange error
+	|        |       |        +--Total bad requests
+	|        |       +--Average latency
+	|        +--Good requests
+	+---Total requests
 */
 func (t *local) Report(resetCounters bool) string {
 	if resetCounters {

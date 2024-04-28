@@ -52,41 +52,41 @@ func (t *remote) Name() string {
 }
 
 /*
-
 Report returns a multi-line string showing stats suitable for printing to a log file. Reset counters
 if resetCounters is true.
 
 Output:
 
 Totals: req=305 ok=301 errs=2 (4/0)
-        ^       ^      ^       ^ ^
-        |       |      |       | |
-        |       |      |       | +--RFFU Error
-        |       |      |       +--DNSPackError
-        |       |      +--Total Error Requests
-        |       +--Total Good requests
-        +---Total Requests
+
+	^       ^      ^       ^ ^
+	|       |      |       | |
+	|       |      |       | +--RFFU Error
+	|       |      |       +--DNSPackError
+	|       |      +--Total Error Requests
+	|       +--Total Good requests
+	+---Total Requests
 
 Server: ok=301 tl=0.254 rl=0.235 errs=5 (0/0/4/0/0/1) (ecs 0/0/305/64) URL
-        ^      ^        ^        ^       ^ ^ ^ ^ ^ ^  ^    ^ ^ ^   ^   ^
-        |      |        |        |       | | | | | |  |    | | |   |   |
-        |      |        |        |       | | | | | |  |    | | |   |   +-- Server URL
-        |      |        |        |       | | | | | |  |    | | |   +--ecsReturned
-        |      |        |        |       | | | | | |  |    | | +--ecsRequest
-        |      |        |        |       | | | | | |  |    | +--ecsSet
-        |      |        |        |       | | | | | |  |    +--ecsRemoved
-        |      |        |        |       | | | | | |  +--EDNS Client Subnet stats
-        |      |        |        |       | | | | | +--UnpackDNSResponse
-        |      |        |        |       | | | | +--ContentType
-        |      |        |        |       | | | +--ResponseReadAll
-        |      |        |        |       | | +--NonStatusOk
-        |      |        |        |       | +--DoRequest
-        |      |        |        |       +--CreateHTTPRequest
-        |      |        |        +--Per-Server Errors
-        |      |        +--Remote server Latency
-        |      +--Total query Latency
-        +--Good Requests
 
+	^      ^        ^        ^       ^ ^ ^ ^ ^ ^  ^    ^ ^ ^   ^   ^
+	|      |        |        |       | | | | | |  |    | | |   |   |
+	|      |        |        |       | | | | | |  |    | | |   |   +-- Server URL
+	|      |        |        |       | | | | | |  |    | | |   +--ecsReturned
+	|      |        |        |       | | | | | |  |    | | +--ecsRequest
+	|      |        |        |       | | | | | |  |    | +--ecsSet
+	|      |        |        |       | | | | | |  |    +--ecsRemoved
+	|      |        |        |       | | | | | |  +--EDNS Client Subnet stats
+	|      |        |        |       | | | | | +--UnpackDNSResponse
+	|      |        |        |       | | | | +--ContentType
+	|      |        |        |       | | | +--ResponseReadAll
+	|      |        |        |       | | +--NonStatusOk
+	|      |        |        |       | +--DoRequest
+	|      |        |        |       +--CreateHTTPRequest
+	|      |        |        +--Per-Server Errors
+	|      |        +--Remote server Latency
+	|      +--Total query Latency
+	+--Good Requests
 */
 func (t *remote) Report(resetCounters bool) string {
 	if resetCounters {

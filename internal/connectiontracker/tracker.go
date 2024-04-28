@@ -9,13 +9,13 @@ connectiontracker presents a reporter interface so its output can be periodicall
 Typically usage is to create a connectiontracker for a given listen or connect address then call it
 via the http.Server.ConnState function or moral equivalent, i.e:
 
-     ct := connectiontracker.New("Name")
-     s := http.Server{ConnState: func(c net.Conn, state ConnState) {
-                                      ct.ConnState(c.RemoteAddr().String(), time.Now(), state)
-                                  }
+	ct := connectiontracker.New("Name")
+	s := http.Server{ConnState: func(c net.Conn, state ConnState) {
+	                                 ct.ConnState(c.RemoteAddr().String(), time.Now(), state)
+	                             }
 
-     ... time passes and requests occur
-     fmt.Println(ct.Report(true))
+	... time passes and requests occur
+	fmt.Println(ct.Report(true))
 
 If you are running a system in which connections can have multiple sessions such as HTTP2 then you
 should also call SessionAdd/SessionDone when sessions transition from active to closed. This is

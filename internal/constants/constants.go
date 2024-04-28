@@ -5,8 +5,8 @@ global Get() function which returns the Constants by value ensuring that any mod
 
 Typically usage:
 
-    consts := constants.Get()
-    fmt.Println("I am", consts.ProxyProgramName, "based on", consts.RFC)
+	consts := constants.Get()
+	fmt.Println("I am", consts.ProxyProgramName, "based on", consts.RFC)
 
 The primary reason for making this a constructed struct rather than the more typical const () block
 is so that it can be fed directly into templating packages for printing usage messages.

@@ -4,18 +4,17 @@ remote servers.
 
 Typical usage is pretty straightforward. Create the resolver once then use it to resolve dns.Msgs.
 
-
-     res, err := dohresolver.New(dohresolver.Config{....}, &http.Client)
-     for {
-         qname, msg := getMsg()
-         if res.InBailiwick(qname) {
-            reply, details, err := res.Resolve(*dns.Msg)
-            if err == nil {
-               handleReply(reply)
-                ..
-            }
-         }
-     }
+	res, err := dohresolver.New(dohresolver.Config{....}, &http.Client)
+	for {
+	    qname, msg := getMsg()
+	    if res.InBailiwick(qname) {
+	       reply, details, err := res.Resolve(*dns.Msg)
+	       if err == nil {
+	          handleReply(reply)
+	           ..
+	       }
+	    }
+	}
 */
 package doh
 
@@ -221,19 +220,18 @@ func (t *remote) InBailiwick(qName string) bool {
 //
 // 1. If ECSRemove is set remove any ECS OPT from the query
 //
-// 2. If ECSSetCIDR is non-nil and there is no ECS OPT in the query (perhaps because of rule 1.)
-//    then synthesize an ECS OPT from the CIDR.
+//  2. If ECSSetCIDR is non-nil and there is no ECS OPT in the query (perhaps because of rule 1.)
+//     then synthesize an ECS OPT from the CIDR.
 //
-// 3. If ECSRequest is set and there is no ECS OPT in the query (perhaps because of rule 1.) then
-//    set the SynthesizeECS HTTP headers to ask trustydns-server to synthesize an ECS option based on the
-//    HTTPS Client source address.
+//  3. If ECSRequest is set and there is no ECS OPT in the query (perhaps because of rule 1.) then
+//     set the SynthesizeECS HTTP headers to ask trustydns-server to synthesize an ECS option based on the
+//     HTTPS Client source address.
 //
 // These rules are sequentially processed which means that the step 2. test occurs after whatever
 // step 1. may have done.
 //
 // Zero values in the SynthesizeECS HTTP headers have special meaning to the trustydns server in
 // that they instruct it *not* to generate an ECS option under *any* circumstances.
-//
 func (t *remote) Resolve(dnsQ *dns.Msg, dnsQMeta *resolver.QueryMetaData) (*dns.Msg, *resolver.ResponseMetaData, error) {
 	startTime := time.Now() // Track stats
 

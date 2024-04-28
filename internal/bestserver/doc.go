@@ -12,12 +12,12 @@ success/failure and latency. That data is used internally to influence which ser
 
 Typical usage looks like this:
 
- bs := bestServer.NewLatency(Config, ServerList...) // Construct a specific bestserver container
- for {
-      server, _ := bs.Best()                                                 // Get current best server
-      doStuffWithServer(server.Name())                                       // Use it
-      bs.Result(server, success bool, when time.Time, latency time.Duration) // Say how it went
- }
+	bs := bestServer.NewLatency(Config, ServerList...) // Construct a specific bestserver container
+	for {
+	     server, _ := bs.Best()                                                 // Get current best server
+	     doStuffWithServer(server.Name())                                       // Use it
+	     bs.Result(server, success bool, when time.Time, latency time.Duration) // Say how it went
+	}
 
 A call to Result() with the current best server causes a reassessment of the best server. Calls to
 Best() will always return the same server details if no intervening calls to Result() have been
@@ -37,9 +37,9 @@ The 'latency' algorithm generally tries to gravitate towards the lowest latency 
 opportunistically sampling all servers to collect statistics on their performance. The selection
 algorithm is:
 
- - the first server on the list starts as the 'best' server
+  - the first server on the list starts as the 'best' server
 
- - a reassessment occurs if any of the following conditions are true:
+  - a reassessment occurs if any of the following conditions are true:
     o the current 'best' server is given an unsuccessful result
     o the configured reassessment timer has expired
     o the configured number of Result() calls have been reached

@@ -11,13 +11,14 @@
 //
 // Usage is as documented in the flags package:
 //
-//	var ms flagutil.StringValue
-//      flagSet.Var(&ms, "someopt", "Short description of opt")
-//      args := ms.Args() // Return an array of strings
-// or
-//      flag.Var(&ms, "someopt", "Short description of opt")
-//      args := ms.Args() // Return an array of strings
+//		var ms flagutil.StringValue
+//	     flagSet.Var(&ms, "someopt", "Short description of opt")
+//	     args := ms.Args() // Return an array of strings
 //
+// or
+//
+//	flag.Var(&ms, "someopt", "Short description of opt")
+//	args := ms.Args() // Return an array of strings
 package flagutil
 
 import (
