@@ -1,6 +1,6 @@
 module github.com/markdingo/trustydns
 
-go 1.19
+go 1.23.0
 
 require (
 	github.com/google/gops v0.3.28
