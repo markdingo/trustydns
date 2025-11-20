@@ -57,7 +57,7 @@ which case it may be removed in a future release.
 
 ### Installation
 
-This package should compile and run on most Unix-like systems which support go1.12.1 or higher. All
+This package should compile and run on most Unix-like systems which support go1.23 or higher. All
 programs have been tested on various CPU architectures with FreeBSD, Linux and macOS. The
 [Makefile](./Makefile) in the root directory is a very simple affair which builds and installs the programs into
 `/usr/local/{sbin|bin}`. Feel free to modify it to suit your environment.
